@@ -1,0 +1,27 @@
+% layout 'main';
+
+<h2>System</h2>
+OS Type:<br/>
+Time: 19/Aug/2011 07:04<br/>
+Kernel:<br/>
+Hostname:<br/>
+Uptime:<br/>
+<h2>CPU</h2>
+Vendor: GenuineIntel<br/>
+CPUs: 2<br/>
+Model name: Genuine Intel(R) CPU           U4100  @ 1.30GHz<br/>
+Model name: 1200.000 MHz<br/>
+L2 cache 2048 KB<br/>
+
+
+<h2>Memory</h2>
+Memory total: 3801 MiB<br/>
+Free: 61% (2348 MiB)<br/>
+<br/>
+Swap total: 255 MiB<br/>
+Free: 100% (255 MiB)<br/>
+<br/>
+
+<h2>Storage</h2>
+Local disk space:	2.81 GB total<br/>
+Free: 1.86 GB used<br/> 

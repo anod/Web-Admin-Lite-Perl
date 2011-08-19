@@ -1,0 +1,35 @@
+% layout 'main';
+
+% if ( param 'killed' ne '') {
+	<span class="kill_ouptut"><%= param 'killed' %></span>
+%} 
+
+CPU load averages	1.10 (1 min) 1.39 (5 mins) 1.55 (15 mins)
+
+<table class="task_list">
+	<thead>
+		<tr>
+			<th>PID</th>
+			<th>Process Name</th>
+			<th>Status</th>
+			<th>% CPU</th>
+			<th>Nice</th>
+			<th>Memory</th>
+			<th>User</th>
+		</tr>
+	</thead>
+	<tbody>
+% for my $task (@$tasks) {
+	% my ($comm, $stat, $cpu, $nice, $pid, $rss, $user) = @{$task};
+	<tr>
+		<td><a href="/tasks/kill?pid=<%= $pid %>"><%= $pid %></a></td>
+		<td><%= $comm %></td>
+		<td><%= $stat %></td>
+		<td><%= $cpu %></td>
+		<td><%= $nice %></td>
+		<td><%= $rss %></td>
+		<td ><%= $user %></td>
+	</tr>
+%}
+	</tbody>
+</table>
