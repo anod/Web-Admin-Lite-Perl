@@ -1,32 +1,109 @@
 #!/usr/bin/env perl
 
-use Getopt::Long qw(:config auto_help no_ignore_case bundling);
+use Getopt::Long qw(:config no_ignore_case bundling);
 use Pod::Usage;
+use File::stat;
+use Fcntl ':mode';
 
 my $all = 0;
 my $long = 0;
+my $help = 0;
 
-GetOptions('all|a' => \$all, 'l' => \$long);
+GetOptions(
+	'help|?' => \$help,
+	'all|a' => \$all,
+	'l' => \$long,
+	
+) or pod2usage(2);
 
-#print 'Do not ignore . ' if $all;
-#print 'Long listing ' if $long;
+pod2usage(1) if $help;
 
-cmd_ls();
+cmd_ls($all,$long);
 
 sub cmd_ls
 {
+	my ($all,$long) = @_;
 	my $pattern= '*';
+	
 	$dir=$ENV{PWD};
 	opendir( DIR, $dir) || return ();
-	my @files= grep { /^$pattern$/ } readdir(DIR);
+	my @files= sort grep { /^$pattern$/ } readdir(DIR);
 	closedir( DIR);
-	print_list(sort @files);
-	return (1,undef);
+	
+	@files =  grep(/^[^\.].*/,@files) if !$all;
+
+	print 'total '.total_blocks(@files)."\n";
+
+	@files = map { long_format($_) } @files;
+	
+	
+	$delim = $long ? "\n" : " ";
+	print_list($delim, @files);
+	print "\n";
+	return ();
 }
+
+sub total_blocks() 
+{
+	my (@files) = @_;
+	my $blocks = 0;
+	for my $filename (@files) {
+		my $sb = stat($filename);
+		$blocks+=$sb->blksize;
+	}
+	return $blocks / 1024;
+}
+
+sub long_format() 
+{
+	my ($filename) = @_;
+	my $sb = stat($filename);
+	my $name  = getpwuid($sb->uid);
+	my $group  = getgrgid($sb->gid);
+	my $time = scalar localtime $sb->mtime;
+	my $mode = mode_string($sb->mode); 	
+    return sprintf "%s %d %s %s %s %s %s",
+           $mode, $sb->nlink, $name, $group, $sb->size, $time, $filename;
+}
+
+sub mode_string()
+{
+  my ($mode) = @_; 
+  my $str = ftypelet($mode);
+  $str.=rwx(($mode & 0700) << 0);
+  $str.=rwx(($mode & 0070) << 3);
+  $str.=rwx(($mode & 0007) << 6);
+
+}
+
+sub ftypelet()
+{
+  my ($mode) = @_;
+  return 'b' if S_ISBLK($mode); #block special files
+  return 'c' if S_ISCHR($mode); #character special files
+  return 'd' if S_ISDIR($mode); #directories
+  return '-' if S_ISREG($mode); #regular files
+  return 'p' if S_ISFIFO($mode);#fifos
+  return 'l' if S_ISLNK($mode); #symbolic links
+  return 's' if S_ISSOCK($mode);#sockets
+  return '?';
+}
+
+sub rwx() {
+	my ($bits) = @_;
+	my $str = "";
+	$str.= ($bits & S_IRUSR) ? 'r' : '-';
+	$str.= ($bits & S_IWUSR) ? 'w' : '-';
+  	$str.= ($bits & S_IXUSR) ? 'x' : '-';
+	return $str;
+}
+
 
 sub print_list
 {
-	my @list= @_;
+
+	my ($delim,@list)= @_;
+
     return unless @list;
     my ($lines, $columns, $mark, $index);
 
@@ -68,7 +145,7 @@ sub print_list
 			$item=~s/\001//g; $item=~s/\002//g;
 			print "$item";
 		}
-        print "\n";
+        print $delim;
     }
 }
 
@@ -76,31 +153,38 @@ __END__
 
 =head1 NAME
 
-sample - Using Getopt::Long and Pod::Usage
+ls - list directory contents
 
 =head1 SYNOPSIS
 
-sample [options] [file ...]
+ls.pl [options] [file ...]
 
- Options:
-   -help            brief help message
-   -man             full documentation
-   
-=head1 OPTIONS
-
+Options: 
+	
 =over 8
 
-=item B<-help>
+=item B<-a, --all>
 
-Print a brief help message and exits.
+do not ignore entries starting with .
 
-=item B<-man>
+=item B<-d, --directory>
 
-Prints the manual page and exits.
+list directory entries instead of contents, and do not dereference symbolic links
+
+=item B<-l>
+
+use a long listing format
+   
+=item B<-s, --size>
+
+print the allocated size of each file, in blocks
+         
+=item B<-t>
+
+sort by modification time
 
 =back
 
 =head1 DESCRIPTION
 
-B<This program> will read the given input file(s) and do something
-useful with the contents thereof.
+B<This program> list directory contents
