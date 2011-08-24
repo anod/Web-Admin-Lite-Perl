@@ -3,26 +3,30 @@
 use Getopt::Long qw(:config no_ignore_case bundling);
 use Pod::Usage;
 use File::stat;
+use POSIX qw(ceil);
 use Fcntl ':mode';
 
 my $all = 0;
 my $long = 0;
 my $help = 0;
+my $size = 0;
+my $directory = 0;
 
 GetOptions(
 	'help|?' => \$help,
-	'all|a' => \$all,
+	'a|all' => \$all,
 	'l' => \$long,
-	
+	's|size' => \$size,
+	'd|directory' => \$directory,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
 
-cmd_ls($all,$long);
+cmd_ls($all,$long,$size,$directory);
 
 sub cmd_ls
 {
-	my ($all,$long) = @_;
+	my ($all,$long,$size,$directory) = @_;
 	my $pattern= '*';
 	
 	$dir=$ENV{PWD};
@@ -31,16 +35,45 @@ sub cmd_ls
 	closedir( DIR);
 	
 	@files =  grep(/^[^\.].*/,@files) if !$all;
-
-	print 'total '.total_blocks(@files)."\n";
-
-	@files = map { long_format($_) } @files;
 	
+
+	if (@ARGV) {
+		@files = grep { filter_files($_) } @ARGV;
+	}
 	
-	$delim = $long ? "\n" : " ";
+
+	if ($long) {
+		print 'total '.total_blocks(@files)."\n";
+		@files = map { long_format($_,$size) } @files;
+	} elsif ($size) {
+		print 'total '.total_blocks(@files)."\n";
+		@files = map { add_size($_) } @files;
+	}
+	
+	$delim = $long ? "\n" : "  ";
 	print_list($delim, @files);
 	print "\n";
 	return ();
+}
+
+sub add_size() 
+{
+	my ($filename) = @_;
+	my $sb = stat($filename);
+	my $sz = calc_blocks($sb->size,$sb->blksize);
+	
+	return $sz.' '.$filename;
+}
+
+sub filter_files() 
+{
+	my ($filename) = @_;
+	if (-e $filename) {
+		return 1;
+	} else {
+		print "ls: cannot access $filename: No such file or directory\n";
+		return 0;
+	}
 }
 
 sub total_blocks() 
@@ -49,21 +82,33 @@ sub total_blocks()
 	my $blocks = 0;
 	for my $filename (@files) {
 		my $sb = stat($filename);
-		$blocks+=$sb->blksize;
+		$blocks+=calc_blocks($sb->size,$sb->blksize);
 	}
-	return $blocks / 1024;
+	
+	return $blocks;
 }
+
 
 sub long_format() 
 {
-	my ($filename) = @_;
+	my ($filename,$size) = @_;
 	my $sb = stat($filename);
 	my $name  = getpwuid($sb->uid);
 	my $group  = getgrgid($sb->gid);
 	my $time = scalar localtime $sb->mtime;
 	my $mode = mode_string($sb->mode); 	
-    return sprintf "%s %d %s %s %s %s %s",
-           $mode, $sb->nlink, $name, $group, $sb->size, $time, $filename;
+	my $szstr = ($size) ? calc_blocks($sb->size,$sb->blksize).' ' : '';
+    return sprintf "%s %s %d %s %s %ls %s %s",
+           $szstr, $mode, $sb->nlink, $name, $group, $sb->size, $time, $filename;
+}
+
+sub cmp_modtime() {
+		
+}
+
+sub calc_blocks() {
+	my ($size,$blksize) = @_;
+	return ceil($size/$blksize)*($blksize/1024);
 }
 
 sub mode_string()
@@ -166,10 +211,6 @@ Options:
 =item B<-a, --all>
 
 do not ignore entries starting with .
-
-=item B<-d, --directory>
-
-list directory entries instead of contents, and do not dereference symbolic links
 
 =item B<-l>
 
