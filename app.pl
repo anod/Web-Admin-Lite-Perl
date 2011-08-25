@@ -13,8 +13,24 @@ get '/terminal/execute' => sub {
 
 get '/users' => sub {
     my $self = shift;
+    open(PASSWD, "<", "/etc/passwd") or die "cannot read users: $!";
+	$self->stash(
+		users => [
+			map { [ split /:/ ] } <PASSWD>
+		]
+	);
+} => 'users';
+
+get '/users/add' => sub {
+    my $self = shift;
 	
 } => 'users';
+
+get '/users/del' => sub {
+    my $self = shift;
+	
+} => 'users';
+
 
 get '/tasks' => sub {
     my $self = shift;
@@ -42,4 +58,3 @@ get '/backup' => sub {
 
 
 app->start;
-

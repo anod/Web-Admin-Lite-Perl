@@ -1,3 +1,31 @@
 % layout 'main';
 
-TODO: Users management here
+<%= link_to 'Add user' => 'users/add' %><br/>
+
+<table class="user_list">
+	<thead>
+		<tr>
+			<th>User</th>
+			<th>UID</th>
+			<th>GID</th>
+			<th>Description</th>
+			<th>Home Folder</th>
+			<th>Shell</th>
+			<th>&nbsp;</th>
+		</tr>
+	</thead>
+	<tbody>
+% for my $user (@$users) {
+	% my ($name, $x, $uid, $gid, $description, $home, $shell) = @{$user};
+	<tr>
+		<td><%= $name %></td>
+		<td><%= $uid %></td>
+		<td><%= $gid %></td>
+		<td><%= $description %></td>
+		<td><%= $home %></td>
+		<td><%= $shell %></td>
+		<td><%= link_to 'edit' => 'users/edit' %>&nbsp;|&nbsp;<%= link_to 'delete' => 'users/delete' %></td>
+	</tr>
+%}
+	</tbody>
+</table>

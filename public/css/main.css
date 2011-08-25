@@ -30,3 +30,8 @@ table.task_list {
 	width: 60%;
 	text-align: center;
 }
+
+table.user_list {
+	width: 60%;
+	border: 1px solid #ccc;
+}
