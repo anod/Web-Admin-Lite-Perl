@@ -1,5 +1,13 @@
 % layout 'main';
 
+
+%= dumper param
+
+Message:
+% if (param 'result' ne '') {
+	<div class="output"><%=param 'result'%></div>
+% }
+<br/>
 <%= link_to 'Add user' => 'users/add' %><br/>
 
 <table class="user_list">
@@ -24,8 +32,11 @@
 		<td><%= $description %></td>
 		<td><%= $home %></td>
 		<td><%= $shell %></td>
-		<td><%= link_to 'edit' => 'users/edit' %>&nbsp;|&nbsp;<%= link_to 'delete' => 'users/delete' %></td>
+		<td><%= link_to "users/edit/$name" => begin %>edit<% end %>&nbsp;|&nbsp;
+		<%= link_to "users/del/$name" => begin %>delete<% end %></td>
 	</tr>
 %}
+
+
 	</tbody>
 </table>

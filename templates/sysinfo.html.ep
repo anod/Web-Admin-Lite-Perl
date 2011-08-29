@@ -2,26 +2,26 @@
 
 <h2>System</h2>
 OS Type:<br/>
-Time: 19/Aug/2011 07:04<br/>
-Kernel:<br/>
-Hostname:<br/>
-Uptime:<br/>
+Time: <%= $timenow %><br/>
+Kernel: <%= $kernel %><br/>
+Hostname: <%= $hostname %><br/>
+Uptime: <%= $uptime %><br/>
 <h2>CPU</h2>
-Vendor: GenuineIntel<br/>
-CPUs: 2<br/>
-Model name: Genuine Intel(R) CPU           U4100  @ 1.30GHz<br/>
-Model name: 1200.000 MHz<br/>
-L2 cache 2048 KB<br/>
+Vendor: <%= $cpu_vendor %><br/>
+CPUs: <%= $cpu_count%><br/>
+Model name: <%= $cpu_model %><br/>
+Frequency: <%= $cpu_speed %> MHz<br/>
+L2 cache: <%= $cpu_l2_cache %><br/>
 
 
 <h2>Memory</h2>
-Memory total: 3801 MiB<br/>
-Free: 61% (2348 MiB)<br/>
+Memory total: <%= $mem_total %> MiB<br/>
+Free: <%= $mem_free_perc %>% (<%= $mem_free %> MiB)<br/>
 <br/>
-Swap total: 255 MiB<br/>
-Free: 100% (255 MiB)<br/>
+Swap total: <%= $swap_total %> MiB<br/>
+Free: <%= $swap_free_perc %>% (<%= $swap_free %> MiB)<br/>
 <br/>
 
 <h2>Storage</h2>
-Local disk space:	2.81 GB total<br/>
-Free: 1.86 GB used<br/> 
+Local disk space: <%= $disk_total %><br/>
+Free: <%= $disk_free %><br/> 
