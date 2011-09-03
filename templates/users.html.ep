@@ -1,10 +1,7 @@
 % layout 'main';
 
 
-%= dumper param
-
-Message:
-% if (param 'result' ne '') {
+% if ((param 'result') ne '') {
 	<div class="output"><%=param 'result'%></div>
 % }
 <br/>

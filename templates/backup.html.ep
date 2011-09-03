@@ -1,3 +1,21 @@
 % layout 'main';
 
-TODO: Backup management here
+% if ((param 'result') ne '') {
+	<span class="backup_output"><%= param 'result' %></span>
+% }
+
+<%= form_for 'backup/create' => (method => 'post') => begin %>
+	<fieldset>
+		<legend>Backup:</legend>
+		<label for="backup_folder">Enter Folder/File:</label><%= text_field 'backup_folder' => $backup_dir %>
+    	<%= submit_button 'Create', name => 'create' %>
+    </fieldset>
+<% end %>
+
+<%= form_for 'backup/restore' => (method => 'post', enctype => 'multipart/form-data') => begin %>
+	<fieldset>
+		<legend>Restore:</legend>
+		<%= file_field 'restore_file' %>
+    	<%= submit_button 'Restore', name => 'restore' %>
+    </fieldset>
+<% end %>

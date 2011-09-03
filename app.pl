@@ -48,7 +48,7 @@ get '/' => sub {
 
 get '/terminal' => 'terminal';
 
-get '/terminal/execute' => sub {
+post '/terminal/execute' => sub {
     my $self = shift;
     my $cmd = $self->param('cmd');
     $self->render(text => `$cmd` );
@@ -67,67 +67,54 @@ get '/users' => sub {
 
 get '/users/add' => sub {
     my $self = shift;
-   	my $save = $self->param('save');
-   	my $name = $self->param('name');
-  
-  	if ($save && $name) {
-  		my $home_dir = $self->param('home_dir');
-  		my $group_name = $self->param('group_name');
-  		my $shell = $self->param('shell');
-
-  		$self->app->log->debug("Adding user $name group: $group_name home dir: $home_dir shell: $shell");
- 		
-	    $self->redirect_to('users', 
-	    	act => 'add', 
-	    	name => \$name, 
-	    	result => qx(useradd -d $home_dir -g $group_name -s $shell $name 2>&1)
-	    );
-	    return;
-  	}
-	$self->stash(
-		name => "",
-		group_name => "",
-		home_dir => "",
-		shell => ""
-  	);
+ 	$self->stash(act=> 'add', name => "", group_name => "", home_dir => "", shell => "");
 
 } => 'users.mod';
 
 get '/users/edit/:name' => sub {
     my $self = shift;
     my $name = $self->stash('name');
-   	my $save = $self->param('save');
-   
-  	if ($save && $name) {
-  		my $home_dir = $self->param('home_dir');
-  		my $group_name = $self->param('group_name');
-  		my $shell = $self->param('shell');
-  		$self->app->log->debug("Saving user $name group: $group_name home dir: $home_dir shell: $shell");
- 		
-	    $self->redirect_to('users',
-	    	act => 'edit', 
-	    	name => \$name, 
-	    	result => qx(usermod -d $home_dir -g $group_name -s $shell $name 2>&1)
-	    );
-	    return;
-  	}
-    open(PASSWD, "<", "/etc/passwd") or die "cannot read users: $!";
-	my @user = map { split /:/ } grep /^$name:/,  <PASSWD>;
-	close PASSWD;
-	
+	my @user = user_info($name);
 	my ($name_real, $x, $uid, $gid, $description, $home, $shell) = @user;
 
-	$self->app->log->debug($self->dumper($shell));
+#	$self->app->log->debug($self->dumper($shell));
 
 	my $group_name = getgrgid($gid);
 
 	$self->stash(
+		act => 'edit',
 		name => $name_real,
 		group_name => $group_name,
 		home_dir => $home,
 		shell => $shell
   	);
 } => 'users.mod';
+
+
+post '/users/save' => sub {
+    my $self = shift;
+    my $name = $self->param('name');
+    my $act = $self->param('act');
+	my $home_dir = $self->param('home_dir');
+  	my $group_name = $self->param('group_name');
+  	my $shell = $self->param('shell');
+  	
+  	$self->app->log->debug("Saving user $name group: $group_name home dir: $home_dir shell: $shell");
+ 		
+	my $url = $self->url_for("users");
+	
+	my $result = ($act eq 'add') ? 
+		qx(useradd -d $home_dir -g $group_name -s $shell $name 2>&1)
+		:	
+		qx(usermod -d $home_dir -g $group_name -s $shell $name 2>&1)
+	;
+	
+	$self->redirect_to($url->query(
+	   	act => $act, 
+	   	name => $name, 
+	   	result => $result
+	));
+};
 
 get '/users/del/:name' => sub {
     my $self = shift;
@@ -136,11 +123,13 @@ get '/users/del/:name' => sub {
   		my $result=qx(userdel $name 2>&1);
   		$self->app->log->debug("Deleting user $name - $result");
  		
-	    $self->redirect_to('users',
-	    	act => 'del', 
+		my $url = $self->url_for("users");
+		$self->redirect_to($url->query(
+			act => 'del', 
 	    	name => $name, 
 	    	result => $result
-	    );
+		));
+
 	    return;
   	}
     $self->redirect_to('users');
@@ -162,17 +151,96 @@ get '/tasks' => sub {
 get '/tasks/kill' => sub {
     my $self = shift;
 	my $pid = $self->param('pid');
-    $self->redirect_to('tasks', killed => qx(kill $pid 2>&1));
+
+	my $url = $self->url_for("tasks");
+	$self->redirect_to($url->query(
+		killed => qx(kill $pid 2>&1)
+	));
+};
+
+get '/backup/(:action)' => sub {
+    my $self = shift;
+	$self->redirect_to('backup');
 };
 
 get '/backup' => sub {
     my $self = shift;
-
+    my $backup_dir = $self->param('dir');
+    if ($backup_dir eq '') {
+		my @user = user_info(getlogin());
+		my ($name_real, $x, $uid, $gid, $description, $home, $shell) = @user;
+		$backup_dir = $home.'/for_backup';
+    }
+	
+	$self->stash(
+		backup_dir => $backup_dir
+	);
 } => 'backup';
+
+post '/backup/create' => sub {
+    my $self = shift;
+	my $backup_file = $self->param('backup_folder') || '';
+	my $result = '';
+	
+	$self->app->log->debug("Create a backup for file: $backup_file ...");
+	
+	my $exitcode = 255;
+	if ($backup_file eq '') {
+		$result = 'Backup file cannot be empty';	
+	} else {
+		$result = qx(tar cpzf /tmp/last.tgz $backup_file 2>&1);
+		$exitcode = $? >> 8;
+	}
+	$self->app->log->debug("Exit code: $exitcode");
+	$self->app->log->debug("Result: $result");
+    if ($exitcode == 0) { 
+	 	use Mojolicious::Static; 
+	    my $static = Mojolicious::Static->new();
+  		$self->res->headers->content_disposition(qq|attatchment; filename="backup.tgz"|);
+  		$static->serve($self, '/tmp/last.tgz'); 
+  		$self->rendered;
+    } else {
+		my $url = $self->url_for("/backup");
+		$self->redirect_to($url->query(result => $result, dir => $backup_file));
+    }
+};
+
+post '/backup/restore' => sub {
+    my $self = shift;
+	my $url = $self->url_for("/backup");
+ 	if (my $upload = $self->req->upload('restore_file')) {
+	    my $name = $upload->filename;
+	    $upload->move_to("/tmp/$name");
+	    
+		$self->app->log->debug("Restoring backup from file: $name ...");
+		my $result = qx(tar xpfz '/tmp/$name' -C / 2>&1);
+		my $exitcode = $? >> 8;
+		if ($exitcode == 0) {
+			$result = "File $name restored succesfully";
+		}
+		$self->app->log->debug("Result: $result");
+		$self->redirect_to($url->query(result => $result));
+    } else {
+		$self->redirect_to($url->query(result => "Problem uploading file."));
+    }
+};
 
 
 app->start;
 
+######################
+# HELP FUNCTIONS
+######################
+
+
+# user info by name
+sub user_info {
+	my ($name) = @_;
+    open(PASSWD, "<", "/etc/passwd") or die "cannot read users: $!";
+	my @user = map { split /:/ } grep /^$name:/,  <PASSWD>;
+	close PASSWD;
+	return (@user);
+}
 
 # Read the uptime.
 sub uptime {
@@ -193,6 +261,7 @@ sub loadavg {
 	return (@loadavg);
 }
 
+# retrieve information about CPU
 sub cpuinfo {
 	open FILE, "< /proc/cpuinfo" or die return ("Cannot open /proc/cpuinfo: $!");
 	my %cpuinfo;
@@ -213,6 +282,7 @@ sub cpuinfo {
 	return (%cpuinfo);
 }
 
+# retrieve memory information
 sub meminfo {
 	open FILE, "< /proc/meminfo" or die return ("Cannot open /proc/meminfo: $!");
 	my %cpuinfo;
@@ -233,6 +303,7 @@ sub meminfo {
 	return (%cpuinfo);
 }
 
+# retrieve disk usage information
 sub diskusage {
 	my @info = map { split /\s+/ } grep /^total/, qx(df -kPh --total);
 	my %diskusage;

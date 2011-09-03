@@ -1,15 +1,14 @@
 % layout 'main';
 
-<%= form_for 'users/add' => (method => 'post') => begin %>
+<%= form_for '/users/save' => (method => 'post') => begin %>
 	<fieldset>
+	<%= hidden_field 'act' => $act %>
 	% if ($name ne '') {
 		<legend>Edit user:</legend>
 	% } else {
 		<legend>Add user:</legend>	
 	% }
-	% if ($name ne '') {
     <label for="name">Name:</label><%= text_field 'name' => $name %><br/>
-    % }
 	<label for="group_name">Group:</label><%= text_field 'group_name' => $group_name %><br/>
 	<label for="home_dir">Home dir:</label><%= text_field 'home_dir' => $home_dir %><br/>
 	<label for="shell">Shell:</label><%= text_field 'shell' => $shell %><br/>
