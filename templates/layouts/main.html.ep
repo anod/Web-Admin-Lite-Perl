@@ -7,15 +7,22 @@
 <script type="text/javascript" src="/js/jquery/jquery-1.6.2.js"></script>
 <script type="text/javascript" src="/js/script.js"></script>
 </head>
-<body>
-	<h1>Web Admin Lite</h1>
-	<div>
-		<%= link_to 'Sys Info' => 'sysinfo' %> | 
-  		<%= link_to 'Terminal' => 'terminal' %> |
-   		<%= link_to 'User Management' => 'users' %> |
-   		<%= link_to 'Task Manager' => 'tasks' %> |
-   		<%= link_to 'Backup' => 'backup' %> 
-	</div>
+<body>	
+	<div id="header">
+      <div id="header-content" class="container_12">
+        <a id="header-logo" href="/">
+          <img alt="Header Logo" height="26" src="http://static.opensuse.org/themes/bento/images/header-logo.png?1299597358" width="46">
+        </a>
+        <ul id="global-navigation">
+          <li id="item-sysinfo"><%= link_to 'Sys Info' => 'sysinfo' %></li>
+          <li id="item-terminal"><%= link_to 'Terminal' => 'terminal' %></li>
+          <li id="item-users"><%= link_to 'User Management' => 'users' %></li>
+          <li id="item-tasks"><%= link_to 'Task Manager' => 'tasks' %></li>
+          <li id="item-backup"><%= link_to 'Backup' => 'backup' %> </li>
+        </ul>
+      </div>
+    </div>
+    	
 	<div>
 		<%= content %>
 	</div>
