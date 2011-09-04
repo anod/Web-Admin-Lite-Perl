@@ -9,9 +9,9 @@
 </head>
 <body>	
 	<div id="header">
-      <div id="header-content" class="container_12">
+      <div id="header-content" class="container">
         <a id="header-logo" href="/">
-          <img alt="Header Logo" height="26" src="http://static.opensuse.org/themes/bento/images/header-logo.png?1299597358" width="46">
+        	Web Admin Lite
         </a>
         <ul id="global-navigation">
           <li id="item-sysinfo"><%= link_to 'Sys Info' => 'sysinfo' %></li>
@@ -23,7 +23,7 @@
       </div>
     </div>
     	
-	<div>
+	<div id="content" class="container">
 		<%= content %>
 	</div>
 </body>
