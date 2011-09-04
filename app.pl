@@ -48,10 +48,16 @@ get '/' => sub {
 
 get '/terminal' => 'terminal';
 
-post '/terminal/execute' => sub {
+any '/terminal/execute' => sub {
     my $self = shift;
     my $cmd = $self->param('cmd');
-    $self->render(text => `$cmd` );
+    my $response = '';
+	if ($cmd ne '') {
+    	$response = qx($cmd 2>&1);
+	}
+	$self->app->log->debug("Executing '$cmd', Response: $response");
+	
+	$self->render(text =>  $response);	
 };
 
 get '/users' => sub {
