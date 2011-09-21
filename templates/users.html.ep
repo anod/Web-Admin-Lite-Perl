@@ -2,10 +2,12 @@
 
 
 % if ((param 'result') ne '') {
-	<div class="output"><%=param 'result'%></div>
+	<div class="info_msg"><%=param 'result'%></div>
 % }
-<br/>
-<%= link_to 'Add user' => 'users/add' %><br/>
+
+<div class="sub_menu">
+	<%= link_to 'Add user' => 'users/add' %>
+</div>
 
 <table class="user_list">
 	<thead>

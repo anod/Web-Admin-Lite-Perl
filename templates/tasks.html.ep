@@ -1,12 +1,12 @@
 % layout 'main';
 
 % if ( param 'killed' ne '') {
-	<span class="kill_ouptut"><%= param 'killed' %></span>
+	<span class="kill_ouptut info_msg"><%= param 'killed' %></span>
 %} 
 
-<div>
+<span class="load_avg info_msg">
 CPU load average <%= $loadavg %>
-</div>
+</span>
 
 <table class="task_list">
 	<thead>

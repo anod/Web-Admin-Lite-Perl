@@ -20,6 +20,7 @@ get '/' => sub {
 	$self->app->log->debug($self->app->dumper(%diskusage));
 
 	$self->stash(
+		ostype => qx(uname -o),
 		timenow => strftime("%a %b %e %H:%M:%S %Y", localtime),
 		kernel => qx(uname -r),
 		hostname => qx(hostname),

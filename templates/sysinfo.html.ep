@@ -1,27 +1,35 @@
 % layout 'main';
 
 <h2>System</h2>
-OS Type:<br/>
-Time: <%= $timenow %><br/>
-Kernel: <%= $kernel %><br/>
-Hostname: <%= $hostname %><br/>
-Uptime: <%= $uptime %><br/>
-<h2>CPU</h2>
-Vendor: <%= $cpu_vendor %><br/>
-CPUs: <%= $cpu_count%><br/>
-Model name: <%= $cpu_model %><br/>
-Frequency: <%= $cpu_speed %> MHz<br/>
-L2 cache: <%= $cpu_l2_cache %><br/>
+<div class="info_block">
+	<div class="info_title">OS Type:</div><div class="info_value"><%= $ostype %></div>
+	<div class="info_title">Time:</div><div class="info_value"><%= $timenow %></div>
+	<div class="info_title">Kernel:</div><div class="info_value"><%= $kernel %></div>
+	<div class="info_title">Hostname:</div><div class="info_value"><%= $hostname %></div>
+	<div class="info_title">Uptime:</div><div class="info_value"><%= $uptime %></div>
+</div>
 
+<h2>CPU</h2>
+<div class="info_block">
+	<div class="info_title">Vendor:</div><div class="info_value"><%= $cpu_vendor %></div>
+	<div class="info_title">CPUs:</div><div class="info_value"><%= $cpu_count%></div>
+	<div class="info_title">Model name:</div><div class="info_value"><%= $cpu_model %></div>
+	<div class="info_title">Frequency:</div><div class="info_value"><%= $cpu_speed %> MHz</div>
+	<div class="info_title">L2 cache:</div><div class="info_value"><%= $cpu_l2_cache %></div>
+</div>
 
 <h2>Memory</h2>
-Memory total: <%= $mem_total %> MiB<br/>
-Free: <%= $mem_free_perc %>% (<%= $mem_free %> MiB)<br/>
+<div class="info_block">
+	<div class="info_title">Memory total:</div><div class="info_value"><%= $mem_total %> MiB</div>
+	<div class="info_title">Free:</div><div class="info_value"><%= $mem_free_perc %>% (<%= $mem_free %> MiB)</div>
 <br/>
-Swap total: <%= $swap_total %> MiB<br/>
-Free: <%= $swap_free_perc %>% (<%= $swap_free %> MiB)<br/>
+	<div class="info_title">Swap total:</div><div class="info_value"><%= $swap_total %> MiB</div>
+	<div class="info_title">Free:</div><div class="info_value"><%= $swap_free_perc %>% (<%= $swap_free %> MiB)</div>
 <br/>
+</div>
 
 <h2>Storage</h2>
-Local disk space: <%= $disk_total %><br/>
-Free: <%= $disk_free %><br/> 
+<div class="info_block">
+	<div class="info_title">Local disk space:</div><div class="info_value"><%= $disk_total %></div>
+	<div class="info_title">Free:</div><div class="info_value"><%= $disk_free %></div>
+</div>

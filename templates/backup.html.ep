@@ -1,7 +1,7 @@
 % layout 'main';
 
 % if ((param 'result') ne '') {
-	<span class="backup_output"><%= param 'result' %></span>
+	<span class="backup_output info_msg"><%= param 'result' %></span>
 % }
 
 <%= form_for 'backup/create' => (method => 'post') => begin %>

@@ -107,3 +107,71 @@ table.user_list {
 	width: 900px;
 	border: 1px solid #ccc;
 }
+
+.info_msg {
+	width: 900px;
+	border: 1px solid #ccc;
+	display: block;
+	padding: 10px;
+	margin: 10px 0px;
+	color: #9F6000;
+	background-color: #FEEFB3;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size:13px;
+}
+
+.load_avg {
+	color: #4F8A10;
+	background-color: #DFF2BF;
+	text-align: center;
+	font-weight: bold;
+	padding: 5px;
+}
+
+fieldset { 
+	border:1px solid #690;
+	padding: 5px;
+	margin: 10px 0px;
+}
+
+fieldset legend {
+	padding: 0.2em 0.5em;
+	border:1px solid #690;
+	color: #690;
+	font-size:90%;
+	text-align:left;
+}
+fieldset label {
+	font-weight: bold;
+	width: 150px;
+	display: block;
+	float: left;
+}
+
+div.sub_menu {
+	padding:6px;
+	margin: 6px;
+}
+div.sub_menu a {
+	color: #3b5d14;
+	font-size: 13px;
+	font-weight: bold;
+	padding: 6px 10px 8px;
+	background-color: #ddeec2;
+	border-radius: 13px;
+	-moz-border-radius: 13px;
+	-webkit-border-radius: 13px;	
+}
+
+div.info_block {
+
+}
+div.info_block div.info_value {
+
+}
+
+div.info_block div.info_title {
+	float: left;
+	width: 150px;
+	font-weight: bold;
+}
