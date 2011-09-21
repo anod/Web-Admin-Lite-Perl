@@ -1,4 +1,6 @@
 #!/usr/bin/env perl
+#
+#  PROGRAM: ls
 
 use Getopt::Long qw(:config no_ignore_case bundling);
 use Pod::Usage;
