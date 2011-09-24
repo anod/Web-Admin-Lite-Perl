@@ -16,7 +16,7 @@ $(function(){
 			 $("#terminal_window_ouput").append("&gt;"+cmd+"<br/>");
 		     $("#terminal_window_ouput").append(nl2br(msg,false)+"<br/>")
 		     $("#terminal_command").val("");
-		     $("#terminal_window_ouput").scroll();
+			 $("#terminal_window_ouput").scrollTop($("#terminal_window_ouput")[0].scrollHeight);
 		   }
 		});
 		e.preventDefault();

@@ -54,9 +54,21 @@ any '/terminal/execute' => sub {
     my $cmd = $self->param('cmd');
     my $response = '';
 	if ($cmd ne '') {
-    	$response = qx($cmd 2>&1);
+		$cmd =~ /([^\s]+)(.*)/;
+
+		my $custom = "commands/$1.pl";
+		my $params = $2;
+		$self->app->log->debug("Check for custom command: '$custom'");
+		if (-e $custom) {
+			$self->app->log->debug("Executing custom command: '$custom $params'");
+	    	$response = qx(perl $custom $params 2>&1);	
+		} else {
+			$self->app->log->debug("Fallback to built-in command: '$cmd'");
+	    	$response = qx($cmd 2>&1);	
+		}
 	}
-	$self->app->log->debug("Executing '$cmd', Response: $response");
+
+	$self->app->log->debug("Response: $response");
 	
 	$self->render(text =>  $response);	
 };
