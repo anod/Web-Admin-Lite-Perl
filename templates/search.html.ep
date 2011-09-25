@@ -6,6 +6,7 @@
 % }
 
 <div class="sub_menu">
+	<%= link_to 'find' => 'search' %>
 	<%= link_to 'grep' => 'search' %>
 </div>
 
