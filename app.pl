@@ -244,6 +244,14 @@ post '/backup/restore' => sub {
     }
 };
 
+get '/search' => sub {
+    my $self = shift;
+	$self->stash(
+		expr => '',
+		maxdepth => '',
+		mindepth => '',
+	);
+} => 'search';
 
 app->start;
 

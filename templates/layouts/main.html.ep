@@ -19,6 +19,7 @@
           <li id="item-users"><%= link_to 'User Management' => 'users' %></li>
           <li id="item-tasks"><%= link_to 'Task Manager' => 'tasks' %></li>
           <li id="item-backup"><%= link_to 'Backup' => 'backup' %> </li>
+          <li id="item-backup"><%= link_to 'Find files' => 'search' %> </li>
         </ul>
       </div>
     </div>
