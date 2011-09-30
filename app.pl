@@ -262,6 +262,7 @@ any '/search' => sub {
 	app->log->debug("result: ".$result);
 
 	$self->stash(
+		find_path => $self->param('find_path') || qx(pwd),
 		result => $result
 	);
 } => 'search';
@@ -287,21 +288,17 @@ sub run_find() {
 	my $params = shift;
 	my @fargs = ();
 	my @name_args = qw(empty executable readable writable delete);
-	my %map_args = (
-		'path' => 'string',
-		'regex' => 'string',
-		'amin' => 'int',
-		'cmin' => 'int',
-		'mmin' => 'int',
-		'uname' => 'string',
-		'group' => 'string',
-		'perm' => 'string',
-		'size' => 'float',
-		'inum' => 'int',
-		'maxdepth'=>'int',
-		'mindepth'=>'int'
-	);
+	my @map_args =  qw(path regex amin cmin mmin uname group perm size inum maxdepth mindepth);
+
+	my $find_path = ${$params}{'find_path'};
+	if ($find_path eq '') {
+		return 'Find path is required';
+	}
 	
+    
+    push(@fargs, "-".${$params}{'follow_sym_links'});
+    push(@fargs, $find_path);
+    	
 	for my $elem (@name_args) {
 		if (exists(${$params}{$elem}) && ${$params}{$elem} ne '') {
 			push(@fargs, "-".$elem);
@@ -323,30 +320,12 @@ sub run_find() {
 			push(@fargs, "-name ".${$params}{'name'});
 		}
 	}    
-   
-    
- 	for my $elem ( keys %map_args ) {
-		if (exists(${$params}{$elem}) && ${$params}{$elem} ne '') {
-			my $type = $map_args{$elem};
-			my $param = '';
-			given($type) {
-				when ("string") { $param = ${$params}{$elem}; }
-				when ("int") { $param = int(${$params}{$elem}); }
-				when ("float") { $param =  sprintf("%f",${$params}{$elem}); }
-			}
-			push(@fargs, "-".$elem." ".$param);
-		}
-		
-    }
 
-	my $size = @fargs;	
-	app->log->debug("fargs length: ".$size);	
-	
-    if (!$size) {
-    	return 'No parameters provided';
+ 	for my $elem (@map_args) {
+		if (exists(${$params}{$elem}) && ${$params}{$elem} ne '') {
+			push(@fargs, "-".$elem." ".${$params}{$elem});
+		}
     }
-    
-    unshift(@fargs, "-".${$params}{'follow_sym_links'});
     
     #TODO actions
 
