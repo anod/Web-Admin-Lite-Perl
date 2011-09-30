@@ -10,8 +10,10 @@
 	<%= link_to 'grep' => 'search' %>
 </div>
 
-<%= form_for '/find' => (method => 'post') => begin %>
-	<%= hidden_field 'type' => 'find' %>
+Result: <div class="search_result"><%=$result%></div>
+
+<%= form_for '/search' => (method => 'post') => begin %>
+	<%= hidden_field 'cmd' => 'find' %>
 
 	<fieldset><legend>TESTS</legend>
 		<label for="name">Name pattern</label><%= text_field 'name' => '' %> (<%= check_box 'iname' => 1 %> case insensitive ) <br/>
@@ -52,8 +54,8 @@
 	</fieldset>
 
 	<fieldset><legend>OPTIONS</legend>
-		<label for="maxdepth">Max depth:</label><%= check_box 'maxdepth_box' => 1, id => 'maxdepth_box' %>  <%= text_field 'maxdepth' => $maxdepth %><br/>
-		<label for="mindepth">Min depth:</label><%= check_box 'mindepth_box' => 1, id => 'mindepth_box' %>  <%= text_field 'mindepth' => $maxdepth %><br/>
+		<label for="maxdepth">Max depth:</label><%= text_field 'maxdepth' => '' %><br/>
+		<label for="mindepth">Min depth:</label><%= text_field 'mindepth' => '' %><br/>
 		<label for="follow_sym_links">Folow symbolic links:</label>
 		<%= radio_button 'follow_sym_links' => 'P', checked => 'checked' %> Never follow symbolic links
 		<%= radio_button 'follow_sym_links' => 'L' %> Follow symbolic links
@@ -65,4 +67,6 @@
 		<%= check_box 'exec_box' => 1 %> Exec command <%= text_field 'exec' => '' %><br/>
     </fieldset>
     <%= submit_button 'Find', name => 'search' %>
+
+
 <% end %>

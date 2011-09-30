@@ -244,12 +244,25 @@ post '/backup/restore' => sub {
     }
 };
 
-get '/search' => sub {
+any '/search' => sub {
     my $self = shift;
+	my $cmd = $self->param('cmd') || '';
+	my $result = '';
+	$self->app->log->debug("Search Command: '$cmd'");
+	
+	my $params = params_to_hash($self);
+
+	
+	if ($cmd eq 'find') {
+		$result = run_find($params);
+ 	} elsif ($cmd eq 'grep') {
+		$result = run_grep($params);
+	}
+
+	app->log->debug("result: ".$result);
+
 	$self->stash(
-		expr => '',
-		maxdepth => '',
-		mindepth => '',
+		result => $result
 	);
 } => 'search';
 
@@ -258,6 +271,101 @@ app->start;
 ######################
 # HELP FUNCTIONS
 ######################
+
+sub params_to_hash {
+	my ($c) = @_;
+	my @names = $c->param;
+	my %params = ();
+	for my $key (@names) { 
+		$params{$key} = $c->param($key);
+	}
+	return \%params;
+}
+
+#exec find accroding to provided params 
+sub run_find() {
+	my $params = shift;
+	my @fargs = ();
+	my @name_args = qw(empty executable readable writable delete);
+	my %map_args = (
+		'path' => 'string',
+		'regex' => 'string',
+		'amin' => 'int',
+		'cmin' => 'int',
+		'mmin' => 'int',
+		'uname' => 'string',
+		'group' => 'string',
+		'perm' => 'string',
+		'size' => 'float',
+		'inum' => 'int',
+		'maxdepth'=>'int',
+		'mindepth'=>'int'
+	);
+	
+	for my $elem (@name_args) {
+		if (exists(${$params}{$elem}) && ${$params}{$elem} ne '') {
+			push(@fargs, "-".$elem);
+		}
+    }
+
+	if (exists(${$params}{'type'}) && ${$params}{'type'} ne '') {
+		push(@fargs, "-type ".${$params}{'type'});
+	}
+	if (exists(${$params}{'size'}) && ${$params}{'size'} ne '') {
+		push(@fargs, "-size ".${$params}{'size'}.${$params}{'size_type'});
+	}
+    
+	if (exists(${$params}{'name'}) && ${$params}{'name'} ne '') {
+		#check for case insensetive flag
+		if (exists(${$params}{'iname'}) && ${$params}{'iname'} ne '') {
+			push(@fargs, "-iname ".${$params}{'name'});
+		} else {
+			push(@fargs, "-name ".${$params}{'name'});
+		}
+	}    
+   
+    
+ 	for my $elem ( keys %map_args ) {
+		if (exists(${$params}{$elem}) && ${$params}{$elem} ne '') {
+			my $type = $map_args{$elem};
+			my $param = '';
+			given($type) {
+				when ("string") { $param = ${$params}{$elem}; }
+				when ("int") { $param = int(${$params}{$elem}); }
+				when ("float") { $param =  sprintf("%f",${$params}{$elem}); }
+			}
+			push(@fargs, "-".$elem." ".$param);
+		}
+		
+    }
+
+	my $size = @fargs;	
+	app->log->debug("fargs length: ".$size);	
+	
+    if (!$size) {
+    	return 'No parameters provided';
+    }
+    
+    unshift(@fargs, "-".${$params}{'follow_sym_links'});
+    
+    #TODO actions
+
+
+
+    my $find = "find ".join(' ',@fargs);
+    app->log->debug("`$find`"); 
+
+    return qx($find);
+#    my $result='';
+#	open my $output, "-|", "find", @fargs;
+#	while (my $line = <$output>)
+#	{
+#       $result.=$line;
+#    }
+#	close($output);
+#	
+#	return $result;       
+}
 
 
 # user info by name
