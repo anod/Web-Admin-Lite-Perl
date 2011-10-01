@@ -245,23 +245,37 @@ post '/backup/restore' => sub {
     }
 };
 
-get '/search/find' => sub {
+get '/search/:reqcmd' => [reqcmd => ['find', 'grep']] => sub {
     my $self = shift;
 	my $search_params = $self->session->{search};
+	my $reqcmd  = $self->param('reqcmd');
 	
 	$self->app->log->debug($self->app->dumper(${$search_params}{'find_path'}));
 	
-	for my $key (keys %{$search_params}) {
-		my $value =  ${$search_params}{$key};
-		$self->param($key, $value);	
-	}
-	
+	if ( ${$search_params}{'cmd'} eq $reqcmd) {
+		for my $key (keys %{$search_params}) {
+			my $value =  ${$search_params}{$key};
+			$self->param($key, $value);	
+		}
+	}	
 	
 	$self->stash(
-		find_path => ${$search_params}{'find_path'} || qx(pwd),
-		search_params => (exists ${$search_params}{'cmd'} && ${$search_params}{'cmd'} eq 'find') ? $search_params : {}
+		find_path => ${$search_params}{'find_path'} || qx(pwd)
 	);	
-} => 'search.find';
+	$self->render('search.'.$reqcmd);
+};
+
+get '/search/find/help' => sub {
+    my $self = shift;
+    my $opt = $self->param('opt') || '';
+    my $response = '';
+    
+    if ($opt ne '') {
+    	$response = man_opts('find',$opt);
+	    $response =~ s/\n/<br\/>/g;
+    }
+	$self->render(text => $response || 'No info found');	
+};
 
 post '/search/result' => sub {
     my $self = shift;
@@ -436,4 +450,45 @@ sub diskusage {
 	$diskusage{'TotalAvail'} = $info[1];
 	$diskusage{'TotalFree'} = $info[3];
 	return (%diskusage);
+}
+
+sub man_opts {
+	my ($func,$option) = @_;
+	
+	my $result = qx(man -7 --nh --nj $func);
+
+#	if ($result =~ /(\s\s\s+)\Q$option\E\b([^\n]+)\n([^\n]+)$/m) {
+#		return $2.$3;
+#	} else {
+#		return "Option not matched";
+#	}
+
+	my $info='';
+	my $spaces;
+	my $inside = 0;
+	foreach my $line (split("\n", $result)) {
+		if (!$inside) {
+    		if ($line =~ /^(\s*)\Q$option\E\b/p) {
+        		# start of this option
+        		$spaces = $1;
+        		$inside = 1;
+        		$line =~ s/^\s+//;
+        		$info.=$line."\n";
+    		}
+		}else {
+	    	if ($line =~ /^$spaces\S/) {
+	        	# start of next option;
+	        	return $info;
+	    	}
+	    	elsif ($line =~ /^\S/) {
+	        	# start of next section
+	        	return $info;
+	    	}
+	    	else {
+        		$line =~ s/^\s+//;
+	        	$info.=$line."\n";
+	    	}
+		}
+	}
+	return $info;
 }

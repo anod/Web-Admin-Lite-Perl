@@ -1,76 +1,28 @@
 % layout 'main';
 
-
-% if ((param 'result') ne '') {
-	<div class="info_msg"><%=param 'result'%></div>
-% }
-
 <div class="sub_menu">
-	<%= link_to 'find' => 'search' %>
-	<%= link_to 'grep' => 'search' %>
+	<%= link_to 'find' => 'find' %>
+	<%= link_to 'grep' => (class => 'selected') => begin %>grep<% end %>
 </div>
 
-<%= form_for '/search' => (method => 'post') => begin %>
-	<%= hidden_field 'cmd' => 'find' %>
+<%= form_for '/search/result' => (method => 'post') => begin %>
+	<%= hidden_field 'cmd' => 'grep' %>
 
-	<fieldset><legend>FIND PATH</legend>
-		<%= text_field 'find_path' => $find_path %>
-		<%= submit_button 'Find', name => 'search' %>
+	<fieldset><legend>GREP</legend>
+		PATTERN: <%= text_field 'pattern' %>
+		FILE: <%= text_field 'path' %>
+		<%= submit_button 'grep', name => 'search' %>
 	</fieldset>
-	<fieldset><legend>TESTS</legend>
-		<label for="name">Name pattern</label><%= text_field 'name' => '' %> (<%= check_box 'iname' => 1 %> case insensitive ) <br/>
-		<label for="path">Path pattern</label><%= text_field 'path' => '' %> <br/>
-		<label for="regex">Regex pattern</label><%= text_field 'regex' => '' %>  File  name  matches regular expression pattern <br/>
-
-	    <label for="amin">Last accessed</label><%= text_field 'amin' => '' %> minutes ago. <br/>
-	    <label for="cmin">Last changed</label><%= text_field 'cmin' => '' %> minutes ago. <br/>
-	    <label for="mmin">Last modified</label><%= text_field 'mmin' => '' %> minutes ago. <br/>
-
-		<label for="empty">Empty</label><%= check_box 'empty' => 1 %> File is empty and is either a regular file or a directory.<br/>
-		<label for="executable">Executable</label><%= check_box 'executable' => 1 %> Matches files which are executable and directories which are searchable  (in  a file name resolution sense).<br/>
-		<label for="readable">Readable</label><%= check_box 'readable' => 1 %> Matches  files  which  are  readable.<br/>
-		<label for="writable">Writable</label><%= check_box 'writable' => 1 %> Matches files which  are  writable.<br/>
-
-		<label for="uname">User</label> <%= text_field 'uname' => '' %> File is owned by user uname (numeric user ID allowed). <br/>
-		<label for="group">Group</label> <%= text_field 'group' => '' %> File belongs to group gname (numeric group ID allowed). <br/>
-		<label for="perm">Permission mode</label> <%= text_field 'perm' => '' %> <br/>
-		<label for="size">Size</label><%= text_field 'size' => '' %> 
-			<%= radio_button 'size_type' => 'b', checked => 'checked' %> blocks
-			<%= radio_button 'size_type' => 'c' %> bytes
-			<%= radio_button 'size_type' => 'w' %> two-byte words
-			<%= radio_button 'size_type' => 'k' %> Kilobytes
-			<%= radio_button 'size_type' => 'M' %> Megabytes
-			<%= radio_button 'size_type' => 'G' %> Gigabytes
-		<br/>
-		<label for="inum">Inode number</label> <%= text_field 'inum' => '' %> <br/>
-		<label for="type">Type</label>
-			<%= radio_button 'type' => '', checked => 'checked' %> No type specified
-			<%= radio_button 'type' => 'b' %> blocks
-			<%= radio_button 'type' => 'c' %> caracter
-			<%= radio_button 'type' => 'd' %> directory
-			<%= radio_button 'type' => 'p' %> name pipe
-			<%= radio_button 'type' => 'f' %> regular file
-			<%= radio_button 'type' => 'l' %> symbolic link
-			<%= radio_button 'type' => 's' %> socket
-		<br/>
-	</fieldset>
-
 	<fieldset><legend>OPTIONS</legend>
-		<label for="maxdepth">Max depth:</label><%= text_field 'maxdepth' => '' %><br/>
-		<label for="mindepth">Min depth:</label><%= text_field 'mindepth' => '' %><br/>
-		<label for="follow_sym_links">Folow symbolic links:</label>
-		<%= radio_button 'follow_sym_links' => 'P', checked => 'checked' %> Never follow symbolic links
-		<%= radio_button 'follow_sym_links' => 'L' %> Follow symbolic links
-		<%= radio_button 'follow_sym_links' => 'H' %> Do  not  follow symbolic links, except while processing the com‐mand line arguments.
+
+		<label for="i"><span data-opt="-i" class="man_tooltip">Ignore case</span></label><%= check_box 'i' => 1 %><br/>
+		
+		<label for="r"><span data-opt="-r" class="man_tooltip">Recursive</span></label><%= check_box 'r' => 1 %><br/>
+
+		<label for="n"><span data-opt="-n" class="man_tooltip">Line numbers</span></label><%= check_box 'n' => 1 %><br/>
+
+		<br/>
 	</fieldset>
-	
-	<fieldset><legend>ACTIONS</legend>
-		<%= check_box 'delete' => 1 %> Delete files<br/>
-		<%= check_box 'exec_box' => 1 %> Exec command <%= text_field 'exec' => '' %><br/>
-    </fieldset>
 
 <% end %>
 
-% if ($result ne '') {
-Result: <div class="search_result"><pre><%=$result%><pre></div>
-% }

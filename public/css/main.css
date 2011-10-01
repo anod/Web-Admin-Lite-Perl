@@ -201,3 +201,26 @@ div.progress_bar {
 	height: 20px;
 	width: 350px;
 }
+
+span.man_tooltip {
+	text-decoration: none; border-bottom:1px dashed;	
+}
+
+.tooltip {
+	font-family:  "monospace";
+	font-size: 13px;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 3;
+	display: none;
+	padding: 10px;
+	color: white;
+	width: 500px;
+	background-color: rgba(0,0,0,0.8);
+	border-radius: 13px;
+	-moz-border-radius: 13px;
+	-webkit-border-radius: 13px;
+	font-weight: normal;
+}
+            

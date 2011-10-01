@@ -16,25 +16,25 @@
 		<%= submit_button 'Find', name => 'search' %>
 	</fieldset>
 	<fieldset><legend>TESTS</legend>
-		<label for="name">Name pattern</label><%= text_field 'name' %> 
-		(<%= check_box 'iname' => 1 %> case insensitive ) <br/>
-		<label for="path">Path pattern</label><%= text_field 'path' %> <br/>
-		<label for="regex">Regex pattern</label><%= text_field 'regex' %> 
+		<label for="name"><span data-opt="-name" class="man_tooltip">Name pattern</span></label><%= text_field 'name' %> 
+		(<%= check_box 'iname' => 1 %> <span data-opt="-iname" class="man_tooltip">case insensitive</span>) <br/>
+		<label for="path"><span data-opt="-path" class="man_tooltip">Path pattern</span></label><%= text_field 'path' %> <br/>
+		<label for="regex"><span data-opt="-regex" class="man_tooltip">Regex pattern</span></label><%= text_field 'regex' %> 
 		File  name  matches regular expression pattern <br/>
 
-	    <label for="amin">Last accessed</label><%= text_field 'amin' => ${$search_params}{'amin'} %> minutes ago. <br/>
-	    <label for="cmin">Last changed</label><%= text_field 'cmin' => ${$search_params}{'cmin'} %> minutes ago. <br/>
-	    <label for="mmin">Last modified</label><%= text_field 'mmin' => ${$search_params}{'mmin'} %> minutes ago. <br/>
+	    <label for="amin"><span data-opt="-amin" class="man_tooltip">Last accessed</span></label><%= text_field 'amin' %> minutes ago. <br/>
+	    <label for="cmin"><span data-opt="-cmin" class="man_tooltip">Last changed</span></label><%= text_field 'cmin' %> minutes ago. <br/>
+	    <label for="mmin"><span data-opt="-mmin" class="man_tooltip">Last modified</span></label><%= text_field 'mmin' %> minutes ago. <br/>
 
-		<label for="empty">Empty</label><%= check_box 'empty' => 1 %> File is empty and is either a regular file or a directory.<br/>
-		<label for="executable">Executable</label><%= check_box 'executable' => 1 %> Matches files which are executable and directories which are searchable  (in  a file name resolution sense).<br/>
-		<label for="readable">Readable</label><%= check_box 'readable' => 1 %> Matches  files  which  are  readable.<br/>
-		<label for="writable">Writable</label><%= check_box 'writable' => 1 %> Matches files which  are  writable.<br/>
+		<label for="empty"><span data-opt="-empty" class="man_tooltip">Empty</span></label><%= check_box 'empty' => 1 %> File is empty and is either a regular file or a directory.<br/>
+		<label for="executable"><span data-opt="-executable" class="man_tooltip">Executable</span></label><%= check_box 'executable' => 1 %> Matches files which are executable and directories which are searchable  (in  a file name resolution sense).<br/>
+		<label for="readable"><span data-opt="-readable" class="man_tooltip">Readable</span></label><%= check_box 'readable' => 1 %> Matches  files  which  are  readable.<br/>
+		<label for="writable"><span data-opt="-writable" class="man_tooltip">Writable</span></label><%= check_box 'writable' => 1 %> Matches files which  are  writable.<br/>
 
-		<label for="uname">User</label> <%= text_field 'uname' => '' %> File is owned by user uname (numeric user ID allowed). <br/>
-		<label for="group">Group</label> <%= text_field 'group' => '' %> File belongs to group gname (numeric group ID allowed). <br/>
-		<label for="perm">Permission mode</label> <%= text_field 'perm' => '' %> <br/>
-		<label for="size">Size</label><%= text_field 'size' => '' %> 
+		<label for="user"><span data-opt="-user" class="man_tooltip">User</span></label> <%= text_field 'user' => '' %> File is owned by user uname (numeric user ID allowed). <br/>
+		<label for="group"><span data-opt="-group" class="man_tooltip">Group</span></label> <%= text_field 'group' => '' %> File belongs to group gname (numeric group ID allowed). <br/>
+		<label for="perm"><span data-opt="-perm" class="man_tooltip">Permission mode</span></label> <%= text_field 'perm' => '' %> <br/>
+		<label for="size"><span data-opt="-size" class="man_tooltip">Size</span></label><%= text_field 'size' => '' %> 
 			<%= radio_button 'size_type' => 'b', checked => 'checked' %> blocks
 			<%= radio_button 'size_type' => 'c' %> bytes
 			<%= radio_button 'size_type' => 'w' %> two-byte words
@@ -42,8 +42,8 @@
 			<%= radio_button 'size_type' => 'M' %> Megabytes
 			<%= radio_button 'size_type' => 'G' %> Gigabytes
 		<br/>
-		<label for="inum">Inode number</label> <%= text_field 'inum' => '' %> <br/>
-		<label for="type">Type</label>
+		<label for="inum"><span data-opt="-inum" class="man_tooltip">Inode number</span></label> <%= text_field 'inum' => '' %> <br/>
+		<label for="type"><span data-opt="-type" class="man_tooltip">Type</span></label>
 			<%= radio_button 'type' => '', checked => 'checked' %> No type specified
 			<%= radio_button 'type' => 'b' %> blocks
 			<%= radio_button 'type' => 'c' %> caracter
@@ -56,8 +56,8 @@
 	</fieldset>
 
 	<fieldset><legend>OPTIONS</legend>
-		<label for="maxdepth">Max depth:</label><%= text_field 'maxdepth' => '' %><br/>
-		<label for="mindepth">Min depth:</label><%= text_field 'mindepth' => '' %><br/>
+		<label for="maxdepth"><span data-opt="-maxdepth" class="man_tooltip">Max depth:</span></label><%= text_field 'maxdepth' => '' %><br/>
+		<label for="mindepth"><span data-opt="-mindepth" class="man_tooltip">Min depth:</span></label><%= text_field 'mindepth' => '' %><br/>
 		<label for="follow_sym_links">Folow symbolic links:</label>
 		<%= radio_button 'follow_sym_links' => 'P', checked => 'checked' %> Never follow symbolic links
 		<%= radio_button 'follow_sym_links' => 'L' %> Follow symbolic links
@@ -65,9 +65,19 @@
 	</fieldset>
 	
 	<fieldset><legend>ACTIONS</legend>
-		<%= check_box 'delete' => 1 %> Delete files<br/>
-		<%= check_box 'exec_box' => 1 %> Exec command <%= text_field 'exec' => '' %><br/>
+		<%= check_box 'delete' => 1 %> <span data-opt="-delete" class="man_tooltip">Delete files</span><br/>
+		<%= check_box 'exec_box' => 1 %> <span data-opt="-exec" class="man_tooltip">Exec command</span> <%= text_field 'exec' => '' %><br/>
     </fieldset>
 
 <% end %>
 
+<script>
+	$('.man_tooltip').simpletip({
+		content: 'Loading...',
+		onBeforeShow: function(){
+			var opt = this.getParent().attr('data-opt');
+      		// Note this refers to the API in the callback function
+      		this.load('/search/find/help',"opt="+opt);
+	   }
+	});
+</script>
