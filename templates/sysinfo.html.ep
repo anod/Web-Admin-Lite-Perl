@@ -1,35 +1,69 @@
 % layout 'main';
 
-<h2>System</h2>
-<div class="info_block">
-	<div class="info_title">OS Type:</div><div class="info_value"><%= $ostype %></div>
-	<div class="info_title">Time:</div><div class="info_value"><%= $timenow %></div>
-	<div class="info_title">Kernel:</div><div class="info_value"><%= $kernel %></div>
-	<div class="info_title">Hostname:</div><div class="info_value"><%= $hostname %></div>
-	<div class="info_title">Uptime:</div><div class="info_value"><%= $uptime %></div>
+<div class="sysinfo_row">
+	<div class="sysinfo_cell">
+		<h2>System</h2>
+		<div class="info_block">
+			<div class="info_title">OS Type:</div><div class="info_value"><%= $ostype %></div>
+			<div class="info_title">Time:</div><div class="info_value"><%= $timenow %></div>
+			<div class="info_title">Kernel:</div><div class="info_value"><%= $kernel %></div>
+			<div class="info_title">Hostname:</div><div class="info_value"><%= $hostname %></div>
+			<div class="info_title">Uptime:</div><div class="info_value"><%= $uptime %></div>
+		</div>
+	</div>
+	
+	<div class="sysinfo_cell">
+		<h2>CPU</h2>
+		<div class="info_block">
+			<div class="info_title">Vendor:</div><div class="info_value"><%= $cpu_vendor %></div>
+			<div class="info_title">CPUs:</div><div class="info_value"><%= $cpu_count%></div>
+			<div class="info_title">Model name:</div><div class="info_value"><%= $cpu_model %></div>
+			<div class="info_title">Frequency:</div><div class="info_value"><%= $cpu_speed %> MHz</div>
+			<div class="info_title">L2 cache:</div><div class="info_value"><%= $cpu_l2_cache %></div>
+		</div>
+	</div>
 </div>
 
-<h2>CPU</h2>
-<div class="info_block">
-	<div class="info_title">Vendor:</div><div class="info_value"><%= $cpu_vendor %></div>
-	<div class="info_title">CPUs:</div><div class="info_value"><%= $cpu_count%></div>
-	<div class="info_title">Model name:</div><div class="info_value"><%= $cpu_model %></div>
-	<div class="info_title">Frequency:</div><div class="info_value"><%= $cpu_speed %> MHz</div>
-	<div class="info_title">L2 cache:</div><div class="info_value"><%= $cpu_l2_cache %></div>
-</div>
-
-<h2>Memory</h2>
-<div class="info_block">
-	<div class="info_title">Memory total:</div><div class="info_value"><%= $mem_total %> MiB</div>
-	<div class="info_title">Free:</div><div class="info_value"><%= $mem_free_perc %>% (<%= $mem_free %> MiB)</div>
-<br/>
-	<div class="info_title">Swap total:</div><div class="info_value"><%= $swap_total %> MiB</div>
-	<div class="info_title">Free:</div><div class="info_value"><%= $swap_free_perc %>% (<%= $swap_free %> MiB)</div>
-<br/>
-</div>
-
-<h2>Storage</h2>
-<div class="info_block">
-	<div class="info_title">Local disk space:</div><div class="info_value"><%= $disk_total %></div>
-	<div class="info_title">Free:</div><div class="info_value"><%= $disk_free %></div>
+<div class="sysinfo_row">
+	<div class="sysinfo_cell">
+		<h2>Memory</h2>
+		<div class="info_block">
+			<div class="info_title">Memory total:</div><div class="info_value"><%= $mem_total %> MiB</div>
+			<div class="info_title">Free:</div><div class="info_value"><%= $mem_free_perc %>% (<%= $mem_free %> MiB)</div>
+			<div class="progress_bar_container"><div id="memory_progress" class="progress_bar"></div></div>
+			<script>
+				$(function() {
+					$( "#memory_progress" ).progressbar({
+						value: 100 - <%= $mem_free_perc %>
+					});
+				});
+			</script>			
+			<div class="info_title">Swap total:</div><div class="info_value"><%= $swap_total %> MiB</div>
+			<div class="info_title">Free:</div><div class="info_value"><%= $swap_free_perc %>% (<%= $swap_free %> MiB)</div>
+			<div class="progress_bar_container"><div id="swap_progress" class="progress_bar"></div></div>
+			<script>
+				$(function() {
+					$( "#swap_progress" ).progressbar({
+						value: 100 - <%= $swap_free_perc %>
+					});
+				});
+			</script>
+		</div>
+	</div>
+	
+	<div class="sysinfo_cell">
+		<h2>Storage</h2>
+		<div class="info_block">
+			<div class="info_title">Local disk space:</div><div class="info_value"><%= $disk_total %></div>
+			<div class="info_title">Free:</div><div class="info_value"><%= $disk_free_perc %>% (<%= $disk_free %>)</div>
+			<div class="progress_bar_container"><div id="disc_progress" class="progress_bar"></div></div>
+			<script>
+				$(function() {
+					$( "#disc_progress" ).progressbar({
+						value: 100 - <%= $disk_free_perc %>
+					});
+				});
+			</script>
+		</div>
+	</div>
 </div>

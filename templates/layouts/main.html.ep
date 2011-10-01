@@ -4,7 +4,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Web Admin Lite</title>
 <link type="text/css" rel="stylesheet" media="screen" href="/css/main.css" rel="Stylesheet" />
-<script type="text/javascript" src="/js/jquery/jquery-1.6.2.js"></script>
+<link type="text/css" href="/css/trontastic/jquery-ui-1.8.16.custom.css" rel="Stylesheet" />	
+<script type="text/javascript" src="/js/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="/js/jquery-ui-1.8.16.custom.min.js"></script>
 <script type="text/javascript" src="/js/script.js"></script>
 </head>
 <body>	
@@ -19,7 +21,7 @@
           <li id="item-users"><%= link_to 'User Management' => 'users' %></li>
           <li id="item-tasks"><%= link_to 'Task Manager' => 'tasks' %></li>
           <li id="item-backup"><%= link_to 'Backup' => 'backup' %> </li>
-          <li id="item-backup"><%= link_to 'Search files' => 'search' %> </li>
+          <li id="item-search"><%= link_to 'Search files' => '/search/find' %> </li>
         </ul>
       </div>
     </div>

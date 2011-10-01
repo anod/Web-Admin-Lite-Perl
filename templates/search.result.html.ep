@@ -1,0 +1,13 @@
+% layout 'main';
+
+
+% if ((param 'result') ne '') {
+	<div class="info_msg"><%=param 'result'%></div>
+% }
+
+<div class="sub_menu">
+	<%= link_to 'find' => 'find' %>
+	<%= link_to 'grep' => 'grep' %>
+</div>
+
+<div class="search_result"><pre><%=$result%><pre></div>

@@ -10,8 +10,6 @@
 	<%= link_to 'grep' => 'search' %>
 </div>
 
-Result: <div class="search_result"><pre><%=$result%><pre></div>
-
 <%= form_for '/search' => (method => 'post') => begin %>
 	<%= hidden_field 'cmd' => 'find' %>
 
@@ -72,3 +70,7 @@ Result: <div class="search_result"><pre><%=$result%><pre></div>
     </fieldset>
 
 <% end %>
+
+% if ($result ne '') {
+Result: <div class="search_result"><pre><%=$result%><pre></div>
+% }

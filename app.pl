@@ -8,7 +8,7 @@ get '/' => sub {
 	my %cpuinfo = cpuinfo();
 	my %meminfo = meminfo();
 	my %diskusage = diskusage();
-	
+
 	my $mem_total = int(int($meminfo{'MemTotal'}) / 1024);
 	my $mem_free = int((int($meminfo{'Cached'}) + int($meminfo{'MemFree'}) + int($meminfo{'Buffers'})) / 1024);
 	my $mem_free_perc = int($mem_free * 100 / $mem_total);
@@ -17,7 +17,7 @@ get '/' => sub {
 	my $swap_free = int(int($meminfo{'SwapFree'}) / 1024);
 	my $swap_free_perc = int($swap_free * 100 / $swap_total);
 
-	$self->app->log->debug($self->app->dumper(%diskusage));
+	#$self->app->log->debug($self->app->dumper(%diskusage));
 
 	$self->stash(
 		ostype => qx(uname -o),
@@ -42,6 +42,7 @@ get '/' => sub {
 		
 		disk_total => $diskusage{'TotalAvail'},
 		disk_free => $diskusage{'TotalFree'},
+		disk_free_perc => int($diskusage{'TotalFree'} * 100 / $diskusage{'TotalAvail'}),
 	);
 	
 	
@@ -244,14 +245,33 @@ post '/backup/restore' => sub {
     }
 };
 
-any '/search' => sub {
+get '/search/find' => sub {
+    my $self = shift;
+	my $search_params = $self->session->{search};
+	
+	$self->app->log->debug($self->app->dumper(${$search_params}{'find_path'}));
+	
+	for my $key (keys %{$search_params}) {
+		my $value =  ${$search_params}{$key};
+		$self->param($key, $value);	
+	}
+	
+	
+	$self->stash(
+		find_path => ${$search_params}{'find_path'} || qx(pwd),
+		search_params => (exists ${$search_params}{'cmd'} && ${$search_params}{'cmd'} eq 'find') ? $search_params : {}
+	);	
+} => 'search.find';
+
+post '/search/result' => sub {
     my $self = shift;
 	my $cmd = $self->param('cmd') || '';
 	my $result = '';
 	$self->app->log->debug("Search Command: '$cmd'");
 	
 	my $params = params_to_hash($self);
-
+	
+	$self->session({search => $params});
 	
 	if ($cmd eq 'find') {
 		$result = run_find($params);
@@ -262,17 +282,18 @@ any '/search' => sub {
 	app->log->debug("result: ".$result);
 
 	$self->stash(
-		find_path => $self->param('find_path') || qx(pwd),
 		result => $result
 	);
-} => 'search';
+} => 'search.result';
 
-app->start;
+app->secret('kesT4dU4');
+app->start('daemon');
 
 ######################
 # HELP FUNCTIONS
 ######################
 
+# convert get parameters ot hash
 sub params_to_hash {
 	my ($c) = @_;
 	my @names = $c->param;
@@ -283,7 +304,7 @@ sub params_to_hash {
 	return \%params;
 }
 
-#exec find accroding to provided params 
+# exec find accroding to provided params 
 sub run_find() {
 	my $params = shift;
 	my @fargs = ();
@@ -330,20 +351,11 @@ sub run_find() {
     #TODO actions
 
 
-
     my $find = "find ".join(' ',@fargs);
     app->log->debug("`$find`"); 
 
-    return qx($find);
-#    my $result='';
-#	open my $output, "-|", "find", @fargs;
-#	while (my $line = <$output>)
-#	{
-#       $result.=$line;
-#    }
-#	close($output);
-#	
-#	return $result;       
+	#TODO escape argss
+    return $find."\n\n".qx($find);
 }
 
 

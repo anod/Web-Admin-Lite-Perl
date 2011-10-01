@@ -162,6 +162,14 @@ div.sub_menu a {
 	-moz-border-radius: 13px;
 	-webkit-border-radius: 13px;	
 }
+div.sub_menu a.selected {
+	background-color: transparent;	
+	color: #000;
+	border: 2px solid #ddeec2;
+}
+div.sub_menu a.selected:hover {
+	text-decoration:none;
+}
 
 div.info_block {
 
@@ -172,6 +180,24 @@ div.info_block div.info_value {
 
 div.info_block div.info_title {
 	float: left;
-	width: 150px;
+	width: 145px;
 	font-weight: bold;
+}
+
+div.sysinfo_row {
+	width: 100%;
+	margin: 0 auto;
+}
+
+div.sysinfo_cell {
+	float:left;
+	width: 50%;	
+}
+
+div.progress_bar_container {
+	margin: 5px 0;
+}
+div.progress_bar {
+	height: 20px;
+	width: 350px;
 }
