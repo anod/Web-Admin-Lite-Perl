@@ -265,14 +265,17 @@ get '/search/:reqcmd' => [reqcmd => ['find', 'grep']] => sub {
 	$self->render('search.'.$reqcmd);
 };
 
-get '/search/find/help' => sub {
+get '/search/help/:cmd' => sub {
     my $self = shift;
     my $opt = $self->param('opt') || '';
+    my $cmd = $self->param('cmd');
     my $response = '';
     
-    if ($opt ne '') {
-    	$response = man_opts('find',$opt);
-	    $response =~ s/\n/<br\/>/g;
+    if ($cmd eq 'find' || $cmd eq 'grep') {
+		if ($opt ne '') {
+    		$response = man_opts($cmd,$opt);
+	    	$response =~ s/\n/<br\/>/g;
+    	}
     }
 	$self->render(text => $response || 'No info found');	
 };
@@ -323,14 +326,13 @@ sub run_find() {
 	my $params = shift;
 	my @fargs = ();
 	my @name_args = qw(empty executable readable writable delete);
-	my @map_args =  qw(path regex amin cmin mmin uname group perm size inum maxdepth mindepth);
+	my @map_args =  qw(path regex amin cmin mmin uname group perm size inum maxdepth mindepth exec);
 
 	my $find_path = ${$params}{'find_path'};
 	if ($find_path eq '') {
 		return 'Find path is required';
 	}
 	
-    
     push(@fargs, "-".${$params}{'follow_sym_links'});
     push(@fargs, $find_path);
     	
@@ -361,17 +363,45 @@ sub run_find() {
 			push(@fargs, "-".$elem." ".${$params}{$elem});
 		}
     }
-    
-    #TODO actions
-
 
     my $find = "find ".join(' ',@fargs);
     app->log->debug("`$find`"); 
 
-	#TODO escape argss
+	#TODO escape args
     return $find."\n\n".qx($find);
 }
 
+# exec grep accroding to provided params 
+sub run_grep() {
+	my $params = shift;
+	my @gargs = ();
+	my @name_args = qw(i v r b n c);
+
+	my $pattern = ${$params}{'pattern'};
+	if ($pattern eq '') {
+		return 'pattern is required';
+	}
+
+	my $path = ${$params}{'path'};
+	if ($path eq '') {
+		return 'path is required';
+	}
+    	
+	for my $elem (@name_args) {
+		if (exists(${$params}{$elem}) && ${$params}{$elem} ne '') {
+			push(@gargs, "-".$elem);
+		}
+    }
+
+    push(@gargs, $pattern);
+    push(@gargs, $path);
+    
+    my $grep = "grep ".join(' ',@gargs);
+    app->log->debug("`$grep`"); 
+
+	#TODO escape args
+    return $grep."\n\n".qx($grep);
+}
 
 # user info by name
 sub user_info {

@@ -77,7 +77,7 @@
 		onBeforeShow: function(){
 			var opt = this.getParent().attr('data-opt');
       		// Note this refers to the API in the callback function
-      		this.load('/search/find/help',"opt="+opt);
+      		this.load('/search/help/find',"opt="+opt);
 	   }
 	});
 </script>

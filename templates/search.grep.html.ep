@@ -16,13 +16,26 @@
 	<fieldset><legend>OPTIONS</legend>
 
 		<label for="i"><span data-opt="-i" class="man_tooltip">Ignore case</span></label><%= check_box 'i' => 1 %><br/>
+		<label for="v"><span data-opt="-v" class="man_tooltip">Invert match</span></label><%= check_box 'v' => 1 %><br/>
 		
-		<label for="r"><span data-opt="-r" class="man_tooltip">Recursive</span></label><%= check_box 'r' => 1 %><br/>
+		<label for="r"><span data-opt="-R" class="man_tooltip">Recursive</span></label><%= check_box 'r' => 1 %><br/>
+		<label for="b"><span data-opt="-b" class="man_tooltip">Print byte offset</span></label><%= check_box 'b' => 1 %><br/>
 
 		<label for="n"><span data-opt="-n" class="man_tooltip">Line numbers</span></label><%= check_box 'n' => 1 %><br/>
-
+		<label for="c"><span data-opt="-c" class="man_tooltip">Count non-matching lines</span></label><%= check_box 'c' => 1 %><br/>
+		
 		<br/>
 	</fieldset>
 
 <% end %>
 
+<script>
+	$('.man_tooltip').simpletip({
+		content: 'Loading...',
+		onBeforeShow: function(){
+			var opt = this.getParent().attr('data-opt');
+      		// Note this refers to the API in the callback function
+      		this.load('/search/help/grep',"opt="+opt);
+	   }
+	});
+</script>
