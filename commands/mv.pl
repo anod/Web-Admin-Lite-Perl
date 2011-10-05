@@ -9,84 +9,83 @@ use POSIX qw(ceil);
 use Fcntl ':mode';
 
 my $opt_force = 0;
-my $opt_target_dircetory = 0;
+my $opt_target_dircetory = '';
 my $opt_no_target_dircetory = 0;
 my $opt_update = 0;
 
 GetOptions(
 	'help|?' => \$opt_help,
 	'f|force' => \$opt_force,
-	't|target-directory' => \$opt_target_dircetory,
+	't|target-directory=s' => \$opt_target_dircetory,
 	'T|no-target-dircetory' => \$opt_no_target_dircetory,
 	'u|update' => \$opt_update,
 ) or pod2usage(2);
 
 pod2usage(1) if $opt_help;
 
-my @files = @ARGV;
+$count = @ARGV;
 
-pod2usage(1) if !@files;
+pod2usage(1) if ($count < 2);
 
-cmd_mv($opt_force,$opt_target_dircetory,$opt_no_target_dircetory,$opt_update);
+
+cmd_mv(
+	$opt_force,$opt_target_dircetory,$opt_no_target_dircetory,$opt_update,
+	@ARGV
+);
 
 
 sub cmd_mv
 {
-	my ($opt_force,$opt_target_dircetory,$opt_no_target_dircetory,$opt_update) = @_;
+	my ($opt_force,$opt_target_dircetory,$opt_no_target_dircetory,$opt_update, @files) = @_;
+	my ($from,$to);
 	
+	if ($opt_target_dircetory) { #move all sources to directory
+		$to = $opt_target_dircetory;
+		if (! -d $to) {
+			print "Target print not a directory.\n";
+			return;
+		}
+		while(@files) {
+			$from=shift(@files);
+			move($opt_force,$from,"$to/$from");
+		}
+		return;
+	}
 	
+	$to = pop @files;
+	
+	if (!$opt_no_target_dircetory && -d $to) {
+		while(@files) {
+			$from=shift(@files);
+			move($opt_force,$from,"$to/$from");
+		}
+		return;		
+	}
+	
+	$count = @files;
+	if ($count > 1) {
+		print "Too many arguments\n";
+		return;	
+	}
+
+	$from = shift(@files);
+	if ($opt_no_target_dircetory || ! -d $to) {
+		move($opt_force, $from, $to);		
+	} else {
+		move($opt_force, $from, "$to/$from");		
+	}
 }
 
 sub move {
-    my($from,$to) = @_;
-    my($copied,$fromsz,$tosz1,$tomt1,$tosz2,$tomt2,$sts,$ossts);
-
-    if (-d $to && ! -d $from) {
-		$to = _catname($from, $to);
-    }
-
-    ($tosz1,$tomt1) = (stat($to))[7,9];
-    $fromsz = -s $from;
-
-    return 1 if rename $from, $to;
-
-    ($sts,$ossts) = ($! + 0, $^E + 0);
-    # Did rename return an error even though it succeeded, because $to
-    # is on a remote NFS file system, and NFS lost the server's ack?
-    return 1 if defined($fromsz) && !-e $from &&           # $from disappeared
-                (($tosz2,$tomt2) = (stat($to))[7,9]) &&    # $to's there
-                ($tosz1 != $tosz2 or $tomt1 != $tomt2) &&  #   and changed
-                $tosz2 == $fromsz;                         # it's all there
-
-    ($tosz1,$tomt1) = (stat($to))[7,9];  # just in case rename did something
-    return 1 if ($copied = copy($from,$to)) && unlink($from);
-
-    ($tosz2,$tomt2) = ((stat($to))[7,9],0,0) if defined $tomt1;
-    unlink($to) if !defined($tomt1) or $tomt1 != $tomt2 or $tosz1 != $tosz2;
-    ($!,$^E) = ($sts,$ossts);
-    return 0;
-}
-
-sub _catname {
-    my($from, $to) = @_;
-    if (not defined &basename) {
-		require File::Basename;
-		import  File::Basename 'basename';
-    }
-
-    return File::Spec->catfile($to, basename($from));
-}
-
-
-sub print_wc
-{
- 	my ($fname, $lines, $words, $chars)=@_;
- 
-	($lines ne "")  && printf("% 8d", $lines);
- 	($words ne "") && printf("% 8d", $words);
- 	($chars ne "") && printf("% 8d", $chars);
- 	($fname ne "-") ? print " $fname" : print " total";
- 	print "\n";
+    my($force, $from, $to) = @_;
+    
+    if ($force) {
+    	unlink	$to;
+    };
+    
+	if (! rename $from, $to) {
+		print "Cannot move $from to $to\n"
+	};
 }
 
 __END__
