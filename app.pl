@@ -48,7 +48,21 @@ get '/' => sub {
 	
 } => 'sysinfo';
 
-get '/terminal' => 'terminal';
+get '/terminal' => sub {
+    my $self = shift;
+	
+	opendir(DIR, "commands");
+	my @commands= readdir(DIR); 
+	closedir(DIR);
+	
+	$self->stash(
+		commands => [
+			map { (my $s = $_) =~ s/\.pl$//; $s } grep { /\.pl$/ } @commands
+		]
+	);
+
+
+} => 'terminal';
 
 any '/terminal/execute' => sub {
     my $self = shift;

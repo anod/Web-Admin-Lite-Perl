@@ -1,5 +1,12 @@
 % layout 'main';
 
+
+<select id="custom_commands">
+	<option value="">Custom command</option>
+% for my $cmd (@$commands) {
+	<option value="<%=$cmd%>"><%=$cmd%></option>
+% }
+</select>
 <div class="terminal_window">
 &gt;<input type="text" id="terminal_command" tabindex="1"/>
 <div id="terminal_window_ouput"></div>

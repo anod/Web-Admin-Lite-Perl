@@ -1,28 +1,103 @@
 
+var history_position = 0;
+var terminal_history = [];
+var key_code = 
+	{
+		 arrow : {left: 37, up: 38, right: 39, down: 40 },
+		 enter : 13
+	}
+
 $(function(){
+	
+	$('#terminal_command').keydown(function (e) {
+	  var code = e.keyCode || e.which;
+		 
+	  switch (code) {
+	  	case key_code.arrow.up:
+	  		history('up');
+	  		return false;
+	    break;
+	  	case key_code.arrow.down:
+	  		history('down');
+	  		return false;
+	    break;
+	  	case key_code.arrow.left:
+	  	case key_code.arrow.right:
+	    default:
+	    	return true;
+	  }
+	});
+		   
 	$("#terminal_command").keypress(function(e) {
 		var code = (e.keyCode ? e.keyCode : e.which);
-		if ( code != 13 ) {
+
+		if (code != key_code.enter) {
 			return true;
 		}
-		var cmd = this.value;
-		var cmd_escaped = encodeURIComponent(cmd);
-		$.ajax({
-		   type: "POST",
-		   url: "/terminal/execute",
-		   data: "cmd="+cmd_escaped,
-		   cache: false,
-		   success: function(msg){
-			 $("#terminal_window_ouput").append("&gt;"+cmd+"<br/>");
-		     $("#terminal_window_ouput").append(nl2br(msg,false)+"<br/>")
-		     $("#terminal_command").val("");
-			 $("#terminal_window_ouput").scrollTop($("#terminal_window_ouput")[0].scrollHeight);
-		   }
-		});
+       	execute(this.value);
 		e.preventDefault();
 		return false;
 	});
+	
+	$("#custom_commands").change(function() {
+		var cmd = $(this).val();
+		if (cmd == "") {
+			return;
+		}
+		set_command(cmd);
+		$(this).val("");
+	});
 });
+
+
+function set_command(cmd) {
+	$("#terminal_command").val(cmd);
+	$("#terminal_command").focus();	
+}
+
+function history(dir) {
+	if (dir == 'down') {
+		if (!terminal_history.length) {
+			return;
+		}
+		if (history_position + 1 > terminal_history.length) {
+			return;
+		}
+		history_position++;
+		set_command(terminal_history[history_position]);
+		return;
+	}
+	if (dir == 'up') {
+		if (!terminal_history.length) {
+			set_command("");
+			return;
+		}
+		if (history_position <= 0) {
+			set_command("");
+			return;			
+		}
+		history_position--;
+		set_command(terminal_history[history_position]);
+		return;
+	}
+}
+
+function execute(cmd) {
+	terminal_history.push(cmd);
+	var cmd_escaped = encodeURIComponent(cmd);
+	$.ajax({
+	   type: "POST",
+	   url: "/terminal/execute",
+	   data: "cmd="+cmd_escaped,
+	   cache: false,
+	   success: function(msg){
+		 $("#terminal_window_ouput").append("&gt;"+cmd+"<br/>");
+	     $("#terminal_window_ouput").append(nl2br(msg,false)+"<br/>")
+	     $("#terminal_command").val("");
+		 $("#terminal_window_ouput").scrollTop($("#terminal_window_ouput")[0].scrollHeight);
+	   }
+	});
+}
 
 
 function nl2br (str, is_xhtml) {
