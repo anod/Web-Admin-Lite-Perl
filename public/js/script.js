@@ -50,6 +50,16 @@ $(function(){
 });
 
 
+$(function(){
+	$("#update_time_toggle").click(function() {
+		$("#update_time_dialog").dialog({
+			modal: true	,
+			resizable: false
+		});
+	});
+});
+
+
 function set_command(cmd) {
 	$("#terminal_command").val(cmd);
 	$("#terminal_command").focus();	

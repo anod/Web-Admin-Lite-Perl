@@ -5,7 +5,53 @@
 		<h2>System</h2>
 		<div class="info_block">
 			<div class="info_title">OS Type:</div><div class="info_value"><%= $ostype %></div>
-			<div class="info_title">Time:</div><div class="info_value"><%= $timenow %></div>
+			<div class="info_title">Time:</div>
+				<div class="info_value"><span id="current_time"><%= $timenow %></span> <a id="update_time_toggle" href="javascript:void()">Change</a>
+				<div id="update_time_dialog" title="Update Date/Time" style="display:none">
+					% my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+					% my @abbr = qw( JAN FEB MAR APR MAY JUN JUL AUG SEP OCT NOV DEC );
+					% $year += 1900;
+					<%= form_for '/time/update' => (method => 'post') => begin %>
+						<select name="day">
+						% for my $d (1..31) {
+							<option value="<%=$d%>" <%=($mday == $d) ? 'selected="selected"' : ''%>><%=$d%></option>
+						% }
+						</select>
+						&nbsp;
+						<select name="month">
+						% for my $m (@abbr) {
+							<option value="<%=$m%>" <%=($m eq $abbr[$mon]) ? 'selected="selected"' : ''%>><%=$m%></option>
+						% }
+						</select>
+						&nbsp;
+						<select name="year">
+						% for my $y (1970..2020) {
+							<option value="<%=$y%>" <%=($y == $year) ? 'selected="selected"' : ''%>><%=$y%></option>
+						% }
+						</select>
+						&nbsp;
+						<select name="hour">
+						% for my $h (0..24) {
+							<option value="<%=$h%>" <%=($hour == $h) ? 'selected="selected"' : ''%>><%=$h%></option>
+						% }
+						</select>
+						:
+						<select name="min">
+						% for my $hm (0..59) {
+							<option value="<%=$hm%>" <%=($hm == $min) ? 'selected="selected"' : ''%>><%=$hm%></option>
+						% }
+						</select>
+						:
+						<select name="sec">
+						% for my $s (0..59) {
+							<option value="<%=$s%>" <%=($s == $sec) ? 'selected="selected"' : ''%>><%=$s%></option>
+						% }
+						</select>
+						<br/>
+						<button type="submit">Update</button>
+					<% end %>
+				</div>
+			</div>
 			<div class="info_title">Kernel:</div><div class="info_value"><%= $kernel %></div>
 			<div class="info_title">Hostname:</div><div class="info_value"><%= $hostname %></div>
 			<div class="info_title">Uptime:</div><div class="info_value"><%= $uptime %></div>
