@@ -152,16 +152,17 @@ post '/users/save' => sub {
   	my $group_name = $self->param('group_name');
   	my $shell = $self->param('shell');
   	
-  	$self->app->log->debug("Saving user $name group: $group_name home dir: $home_dir shell: $shell");
- 		
-	my $url = $self->url_for("users");
+  	$self->app->log->debug("Saving user '$name' group: '$group_name' home dir: '$home_dir' shell: '$shell'");
 	
-	my $result = ($act eq 'add') ? 
+  	my $result = qx(groupadd -f $group_name 2>&1);
+  	$self->app->log->debug("Group add: $result");
+	$result .= " ".(($act eq 'add') ? 
 		qx(useradd -d $home_dir -g $group_name -s $shell $name 2>&1)
 		:	
 		qx(usermod -d $home_dir -g $group_name -s $shell $name 2>&1)
-	;
+	);
 	
+	my $url = $self->url_for("users");
 	$self->redirect_to($url->query(
 	   	act => $act, 
 	   	name => $name, 
