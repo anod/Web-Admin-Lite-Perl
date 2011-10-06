@@ -9,15 +9,14 @@ get '/' => sub {
 	my %meminfo = meminfo();
 	my %diskusage = diskusage();
 
-	my $mem_total = int(int($meminfo{'MemTotal'}) / 1024);
-	my $mem_free = int((int($meminfo{'Cached'}) + int($meminfo{'MemFree'}) + int($meminfo{'Buffers'})) / 1024);
+	my $mem_total = int(stoint($meminfo{'MemTotal'}) / 1024);
+	my $mem_free = int((stoint($meminfo{'Cached'}) + stoint($meminfo{'MemFree'}) + stoint($meminfo{'Buffers'})) / 1024);
+	
 	my $mem_free_perc = int($mem_free * 100 / $mem_total);
 
-	my $swap_total = int(int($meminfo{'SwapTotal'}) / 1024);
-	my $swap_free = int(int($meminfo{'SwapFree'}) / 1024);
-	my $swap_free_perc = int($swap_free * 100 / $swap_total);
-
-	#$self->app->log->debug($self->app->dumper(%diskusage));
+	my $swap_total = int(stoint($meminfo{'SwapTotal'}) / 1024);
+	my $swap_free = int(stoint($meminfo{'SwapFree'}) / 1024);
+	my $swap_free_perc = stoint($swap_free * 100 / $swap_total);
 
 	$self->stash(
 		ostype => qx(uname -o),
@@ -42,14 +41,30 @@ get '/' => sub {
 		
 		disk_total => $diskusage{'TotalAvail'},
 		disk_free => $diskusage{'TotalFree'},
-		disk_free_perc => int($diskusage{'TotalFree'} * 100 / $diskusage{'TotalAvail'}),
+		disk_free_perc => int(stoint($diskusage{'TotalFree'}) * 100 / stoint($diskusage{'TotalAvail'})),
 	);
 	
 	
 } => 'sysinfo';
 
-get '/time/update' => sub {
-	#date --set="2 OCT 2006 18:00:00"
+post '/time/update' => sub {
+    my $self = shift;
+	my $new_date = sprintf(
+		"%d %s %d %d:%d:%d",
+		$self->param('day'),
+		$self->param('month'),
+		$self->param('year'),
+		$self->param('hour'),
+		$self->param('min'),
+		$self->param('sec')
+	);
+	
+	$self->app->log->debug("New date: $new_date");
+	
+	my $url = $self->url_for("/");	
+	$self->redirect_to($url->query(
+	   	result => qx(date --set="$new_date" 2>&1)
+	));	
 };
 
 get '/terminal' => sub {
@@ -456,7 +471,9 @@ sub cpuinfo {
 	while (<FILE>)
 	{
    		chomp;
+   		next if ($_ eq '');   		
    		my ($key, $val) = split /:/;
+   		 
    		$key =~ s/^\s+//;
 		$key =~ s/\s+$//;
    		$val =~ s/^\s+//;
@@ -495,11 +512,13 @@ sub meminfo {
 sub diskusage {
 	my @info = map { split /\s+/ } grep /^total/, qx(df -kPh --total);
 	my %diskusage;
+
 	$diskusage{'TotalAvail'} = $info[1];
 	$diskusage{'TotalFree'} = $info[3];
 	return (%diskusage);
 }
 
+# return man for specific option of function
 sub man_opts {
 	my ($func,$option) = @_;
 	
@@ -539,4 +558,11 @@ sub man_opts {
 		}
 	}
 	return $info;
+}
+
+# string to int
+sub stoint {
+	my ($val) = @_;
+	$val =~ s/[^\d]+//;
+	return int($val);
 }

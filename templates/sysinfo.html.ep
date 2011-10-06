@@ -1,5 +1,9 @@
 % layout 'main';
 
+% if ((param 'result') ne '') {
+	<div class="info_msg"><%=param 'result'%></div>
+% }
+
 <div class="sysinfo_row">
 	<div class="sysinfo_cell">
 		<h2>System</h2>
