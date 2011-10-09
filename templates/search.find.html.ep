@@ -66,7 +66,9 @@
 	
 	<fieldset><legend>ACTIONS</legend>
 		<%= check_box 'delete' => 1 %> <span data-opt="-delete" class="man_tooltip">Delete files</span><br/>
-		<%= check_box 'exec_box' => 1 %> <span data-opt="-exec" class="man_tooltip">Exec command</span> <%= text_field 'exec' => '' %><br/>
+		<%= check_box 'exec_box' => 1 %> <span data-opt="-exec" class="man_tooltip">Exec command</span> <%= text_field 'exec' => '' %>
+		( Example: sed -i 's/cat/dog/' {} \; )
+		<br/>
     </fieldset>
 
 <% end %>

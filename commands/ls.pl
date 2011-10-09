@@ -31,9 +31,9 @@ sub cmd_ls
 	my ($all,$long,$size,$directory) = @_;
 	my $pattern= '*';
 	
-	$dir=$ENV{PWD};
+	$dir=(-d $ARGV[0]) ? shift @ARGV : $ENV{PWD};
 	opendir( DIR, $dir) || return ();
-	my @files= sort grep { /^$pattern$/ } readdir(DIR);
+	my @files= map { $dir."/".$_; } sort grep { /^$pattern$/ } readdir(DIR);
 	closedir( DIR);
 	
 	@files =  grep(/^[^\.].*/,@files) if !$all;
@@ -42,7 +42,6 @@ sub cmd_ls
 	if (@ARGV) {
 		@files = grep { filter_files($_) } @ARGV;
 	}
-	
 
 	if ($long) {
 		print 'total '.total_blocks(@files)."\n";
@@ -51,6 +50,9 @@ sub cmd_ls
 		print 'total '.total_blocks(@files)."\n";
 		@files = map { add_size($_) } @files;
 	}
+	
+	my $p = $dir."/";
+	@files = map { (my $s = $_) =~ s|$p||; $s } @files;
 	
 	$delim = $long ? "\n" : "  ";
 	print_list($delim, @files);
@@ -100,7 +102,7 @@ sub long_format()
 	my $time = scalar localtime $sb->mtime;
 	my $mode = mode_string($sb->mode); 	
 	my $szstr = ($size) ? calc_blocks($sb->size,$sb->blksize).' ' : '';
-    return sprintf "%s %s %d %s %s %ls %s %s",
+    return sprintf "%s %s %3d %s %s %4ls %s %s",
            $szstr, $mode, $sb->nlink, $name, $group, $sb->size, $time, $filename;
 }
 

@@ -2,6 +2,18 @@
 use Mojolicious::Lite;
 use POSIX qw(strftime);
 
+plugin 'basic_auth';
+
+under sub {
+    my $self = shift;
+    return 1 if $self->basic_auth(
+         login => sub { return 1 if "@_" eq 'admin admin' }
+	);
+	
+	$self->render(text=>'denied');
+	return;	
+};
+
 get '/' => sub {
     my $self = shift;
 
@@ -279,7 +291,7 @@ post '/backup/restore' => sub {
     }
 };
 
-get '/search/:reqcmd' => [reqcmd => ['find', 'grep']] => sub {
+get '/search/:reqcmd' => [reqcmd => ['find', 'grep', 'sed']] => sub {
     my $self = shift;
 	my $search_params = $self->session->{search};
 	my $reqcmd  = $self->param('reqcmd');
