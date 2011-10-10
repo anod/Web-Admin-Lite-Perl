@@ -65,9 +65,11 @@
 	</fieldset>
 	
 	<fieldset><legend>ACTIONS</legend>
-		<%= check_box 'delete' => 1 %> <span data-opt="-delete" class="man_tooltip">Delete files</span><br/>
-		<%= check_box 'exec_box' => 1 %> <span data-opt="-exec" class="man_tooltip">Exec command</span> <%= text_field 'exec' => '' %>
-		( Example: sed -i 's/cat/dog/' {} \; )
+		<%= radio_button 'exec_opt' => '' %> <label>None</label><br/>
+		<%= radio_button 'exec_opt' => 'delete' %> <label><span data-opt="-delete" class="man_tooltip">Delete files</span></label><br/>
+		<%= radio_button 'exec_opt' => 'exec' %> <label><span data-opt="-exec" class="man_tooltip">Exec command:</span></label> <%= text_field 'exec' => '' %>
+		( Example: cat {} \; ) <br/>
+		<%= radio_button 'exec_opt' => 'sed' %> <label>SED Pattern:</label>  <%= text_field 'sed_pattern' => '' %> ( Example: s/cat/dog/ )
 		<br/>
     </fieldset>
 
@@ -75,6 +77,7 @@
 
 <script>
 	$('.man_tooltip').simpletip({
+		position: 'right',
 		content: 'Loading...',
 		onBeforeShow: function(){
 			var opt = this.getParent().attr('data-opt');

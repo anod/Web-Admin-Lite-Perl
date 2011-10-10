@@ -371,8 +371,8 @@ sub params_to_hash {
 sub run_find() {
 	my $params = shift;
 	my @fargs = ();
-	my @name_args = qw(empty executable readable writable delete);
-	my @map_args =  qw(path regex amin cmin mmin uname group perm size inum maxdepth mindepth exec);
+	my @name_args = qw(empty executable readable writable);
+	my @map_args =  qw(path regex amin cmin mmin uname group perm size inum maxdepth mindepth);
 
 	my $find_path = ${$params}{'find_path'};
 	if ($find_path eq '') {
@@ -409,6 +409,16 @@ sub run_find() {
 			push(@fargs, "-".$elem." ".${$params}{$elem});
 		}
     }
+
+	if (exists(${$params}{'exec_opt'}) && ${$params}{'exec_opt'} ne '') {
+		if (${$params}{'exec_opt'} eq 'delete') {
+			push(@fargs, "-delete");
+		}elsif(${$params}{'exec_opt'} eq 'sed' && ${$params}{'sed_pattern'} ne '') {
+			push(@fargs, "-exec sed -i '".${$params}{'sed_pattern'}."' {} \\;");
+		} elsif (${$params}{'exec_opt'} eq 'exec' && ${$params}{'exec'} ne '') {
+			push(@fargs, "-exec ".${$params}{'exec'});
+		}
+	}
 
     my $find = "find ".join(' ',@fargs);
     app->log->debug("`$find`"); 
