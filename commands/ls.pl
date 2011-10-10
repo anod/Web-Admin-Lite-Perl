@@ -12,6 +12,7 @@ my $all = 0;
 my $long = 0;
 my $help = 0;
 my $size = 0;
+my $time = 0;
 my $directory = 0;
 
 GetOptions(
@@ -19,16 +20,17 @@ GetOptions(
 	'a|all' => \$all,
 	'l' => \$long,
 	's|size' => \$size,
+	't|time' => \$time,
 	'd|directory' => \$directory,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
 
-cmd_ls($all,$long,$size,$directory);
+cmd_ls($all,$long,$size,$time,$directory);
 
 sub cmd_ls
 {
-	my ($all,$long,$size,$directory) = @_;
+	my ($all,$long,$size,$time,$directory) = @_;
 	my $pattern= '*';
 	
 	$dir=(-d $ARGV[0]) ? shift @ARGV : $ENV{PWD};
@@ -36,11 +38,14 @@ sub cmd_ls
 	my @files= map { $dir."/".$_; } sort grep { /^$pattern$/ } readdir(DIR);
 	closedir( DIR);
 	
-	@files =  grep(/^[^\.].*/,@files) if !$all;
+	@files =  grep(/^$dir\/[^\.].*/,@files) if !$all;
 	
-
 	if (@ARGV) {
 		@files = grep { filter_files($_) } @ARGV;
+	}
+
+	if ($time) {
+    	@files = sort { modtime($b) <=> modtime($a) } @files;
 	}
 
 	if ($long) {
@@ -106,8 +111,10 @@ sub long_format()
            $szstr, $mode, $sb->nlink, $name, $group, $sb->size, $time, $filename;
 }
 
-sub cmp_modtime() {
-		
+sub modtime() {
+	my ($filename) = @_;
+	my $sb = stat($filename);
+	return $sb->mtime;
 }
 
 sub calc_blocks() {
